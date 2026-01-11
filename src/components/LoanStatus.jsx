@@ -57,7 +57,7 @@ const LoanStatus = ({ user, onBack }) => {
     };
 
     return (
-        <div className="min-h-screen bg-agricultural-soft-sand p-8">
+        <div className="min-h-screen bg-agricultural-soft-sand p-8 font-sans">
             <div className="max-w-4xl mx-auto">
                 <div className="flex items-center mb-8">
                     <button
@@ -85,32 +85,60 @@ const LoanStatus = ({ user, onBack }) => {
                         <p className="text-agricultural-stone-gray">You haven't submitted any loan applications yet.</p>
                     </div>
                 ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                         {loans.map((loan) => (
-                            <div key={loan._id} className="bg-white rounded-lg border border-agricultural-stone-gray/20 shadow-sm p-6 transition-all hover:shadow-md">
-                                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                    <div>
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(loan.status)}`}>
+                            <div key={loan._id} className="bg-white rounded-xl border border-agricultural-stone-gray/20 shadow-sm p-6 transition-all hover:shadow-md">
+                                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                                    <div className="w-full">
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${getStatusColor(loan.status)}`}>
                                                 {getStatusIcon(loan.status)}
                                                 {loan.status}
                                             </span>
-                                            <span className="text-xs text-agricultural-stone-gray">
-                                                Applied on {new Date(loan.createdAt).toLocaleDateString()}
+                                            <span className="text-xs font-medium text-agricultural-stone-gray">
+                                                ID: {loan._id.slice(-6).toUpperCase()} • Applied on {new Date(loan.createdAt).toLocaleDateString()}
                                             </span>
                                         </div>
-                                        <h3 className="text-lg font-semibold text-agricultural-soil-brown">
+                                        <h3 className="text-xl font-bold text-agricultural-soil-brown mb-1">
                                             {loan.loanPurpose}
                                         </h3>
-                                        <p className="text-sm text-agricultural-stone-gray mt-1">
-                                            {loan.cropType} • {loan.acres} Acres
-                                        </p>
+                                        <div className="flex gap-4 text-sm text-agricultural-stone-gray">
+                                            <span>{loan.cropType}</span>
+                                            <span>•</span>
+                                            <span>{loan.acres} Acres</span>
+                                        </div>
+
+                                        {/* Blockchain & Smart Contract Details - Only for Approved Loans */}
+                                        {loan.status === 'APPROVED' && loan.blockchainTxHash && (
+                                            <div className="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-4 relative overflow-hidden">
+                                                <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] uppercase font-bold px-2 py-1 rounded-bl-lg">
+                                                    Smart Contract Executed
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Transaction Hash</label>
+                                                        <div className="font-mono text-xs text-gray-800 break-all bg-white border rounded p-2 mt-1">
+                                                            {loan.blockchainTxHash}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Smart Contract Address</label>
+                                                        <div className="font-mono text-xs text-gray-800 break-all bg-white border rounded p-2 mt-1">
+                                                            {loan.smartContractAddress}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-2 text-[10px] text-gray-400 text-center">
+                                                    Funds automatically disbursed via KisaanSaathi secure blockchain network.
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="text-right">
-                                        <div className="text-2xl font-bold text-agricultural-forest-green">
+                                    <div className="text-right flex-shrink-0">
+                                        <div className="text-3xl font-black text-agricultural-forest-green">
                                             ₹{loan.requestedAmount.toLocaleString('en-IN')}
                                         </div>
-                                        <div className="text-sm text-agricultural-stone-gray">
+                                        <div className="text-sm font-medium text-agricultural-stone-gray">
                                             {loan.tenureMonths} Months Tenure
                                         </div>
                                     </div>

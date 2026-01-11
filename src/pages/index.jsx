@@ -87,7 +87,7 @@ const Index = () => {
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center space-x-2">
               <Leaf className="h-8 w-8 text-green-600" />
-              <span className="text-xl font-bold text-gray-900">AgroSure</span>
+              <span className="text-xl font-bold text-gray-900">KisaanSaathi</span>
             </div>
 
             <div className="hidden md:flex items-center space-x-8">
@@ -124,9 +124,9 @@ const Index = () => {
         <div className="container mx-auto px-6 md:px-12 text-center">
           <div className="flex items-center justify-center space-x-2 mb-4 opacity-50">
             <Leaf className="h-6 w-6" />
-            <span className="text-lg font-bold">AgroSure</span>
+            <span className="text-lg font-bold">KisaanSaathi</span>
           </div>
-          <p className="text-gray-400 text-sm">© 2025 AgroSure Protocol. All rights reserved.</p>
+          <p className="text-gray-400 text-sm">© 2025 KisaanSaathi Protocol. All rights reserved.</p>
         </div>
       </footer>
     </div>

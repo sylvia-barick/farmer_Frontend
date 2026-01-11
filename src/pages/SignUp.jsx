@@ -25,6 +25,8 @@ export default function SignUp() {
     phone: '',
     password: '',
     aadharNum: '',
+    landSize: '',
+    crops: '',
     location: {
       state: '',
       district: ''
@@ -125,6 +127,8 @@ export default function SignUp() {
         email: formData.email,
         phone: formData.phone,
         aadharNum: formData.aadharNum,
+        landSize: formData.landSize,
+        crops: formData.crops,
         location: formData.location,
         createdAt: new Date().toISOString(),
         role: 'farmer' // defaulting to farmer
@@ -210,9 +214,25 @@ export default function SignUp() {
           <input
             type='number'
             placeholder='Enter Aadhar number'
-            name='aadharNum'  // was 'aadhar', should be 'aadharNumber'
+            name='aadharNum'
             onChange={handleInputChange}
             value={formData.aadharNum}
+            className='p-4 rounded-xl'
+          />
+          <input
+            type='number'
+            placeholder='Land Size (in Acres)'
+            name='landSize'
+            onChange={handleInputChange}
+            value={formData.landSize}
+            className='p-4 rounded-xl'
+          />
+          <input
+            type='text'
+            placeholder='Crops Grown (e.g. Wheat, Rice)'
+            name='crops'
+            onChange={handleInputChange}
+            value={formData.crops}
             className='p-4 rounded-xl'
           />
 

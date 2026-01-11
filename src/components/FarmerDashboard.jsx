@@ -26,13 +26,14 @@ import LoanApplication from "./loanApplication";
 import InsuranceClaim from "./insuranceClaim";
 import PlantDisease from "./PlantDisease";
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from '../utils/firebaseConfig';
+import { auth, db } from '../utils/firebaseConfig';
+import { doc, getDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import PastReports from "./pastRecords";
 import KisaanSaathi from "./kisaanSaathi";
 import { Menu } from 'lucide-react';
 import axios from 'axios';
-import { getWeather, getFarmSummary } from '../services/backendApi'; // Import new services
+import { getWeather, getFarmSummary, getAgriculturalNews } from '../services/backendApi'; // Import new services
 import FarmMap from './FarmMap';
 
 const FarmerDashboard = ({ user, onLogout }) => {
@@ -69,51 +70,49 @@ const FarmerDashboard = ({ user, onLogout }) => {
 
   const [displayData, setDisplayData] = useState({
     user: {
-      uid: '' || 'd7m74KoesWRw9bdXceJboC7vbUu1',
-      name: '' || 'Debangshu Chatterjee',
-      email: '' || 'debangshuchatterjee2005@gmail.com',
-      totalLand: 0 || 10,
-      crops: [] || ['Wheat', 'Rice', 'Maize'],
-      locationLat: '' || 22.5726,
-      locationLong: '' || 88.3639,
-      isSmallFarmer: false || true,
-      phone: '' || '9876543210',
-      aadhar: '' || '123456789012',
+      uid: '',
+      name: 'Loading...',
+      email: '',
+      totalLand: 0,
+      landSize: 0,
+      crops: [],
+      locationLat: '',
+      locationLong: '',
+      isSmallFarmer: false,
+      phone: '',
+      aadhar: '',
+      aadharNum: ''
     }
   });
 
-  const getDateRange = () => {
-    const today = new Date();
-    const fourteenDaysAgo = new Date();
-    fourteenDaysAgo.setDate(today.getDate() - 14);
-
-    const formatDate = (date) => {
-      const year = date.getFullYear();
-      const month = (`0${date.getMonth() + 1}`).slice(-2); // Months are 0-based
-      const day = (`0${date.getDate()}`).slice(-2);
-      return `${year}-${month}-${day}`;
-    };
-
-    return {
-      endDate: formatDate(today),
-      startDate: formatDate(fourteenDaysAgo),
-    };
-  }
-
+  // Fetch agricultural news using Serper API
   useEffect(() => {
-    console.log("Starting news API call...");
-    const { endDate, startDate } = getDateRange();
+    const fetchNews = async () => {
+      try {
+        console.log("Fetching news from Serper API...");
+        const response = await getAgriculturalNews();
 
-    axios.get(`https://newsdata.io/api/1/latest?apikey=${import.meta.env.VITE_NEWS_API}&q=indian%20agriculture`)
-      .then((response) => {
-        console.log("News API response received:", response);
-        setNewsData(response.data);
-        console.log("News data : ", response.data);
-      })
-      .catch((error) => {
-        console.error("News API error:", error);
-        console.error("Error details:", error.response?.data || error.message);
-      });
+        if (response.success && response.data) {
+          // Transform Serper data to match our UI format
+          const transformedNews = response.data.map(article => ({
+            title: article.title,
+            snippet: article.snippet,
+            time: getRelativeTime(article.date),
+            type: 'agriculture',
+            link: article.link,
+            source: article.source
+          }));
+
+          setFarmingNews(transformedNews);
+          console.log("News fetched successfully:", transformedNews);
+        }
+      } catch (error) {
+        console.error("Error fetching news:", error);
+        setFarmingNews([]);
+      }
+    };
+
+    fetchNews();
   }, []);
 
   useEffect(() => {
@@ -149,46 +148,57 @@ const FarmerDashboard = ({ user, onLogout }) => {
   useEffect(() => {
     let hasFetched = false;
 
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (hasFetched) return;
       hasFetched = true;
 
-      const uidToUse = user ? user.uid : id;
+      const uidToUse = firebaseUser ? firebaseUser.uid : id;
+
+      if (!uidToUse) {
+        console.error('No user ID available');
+        return;
+      }
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/dashboard/${uidToUse}`);
-        const data = await response.json();
-        setUserData(data);
-        setDisplayData(data);
-      } catch (error) {
-        console.error('Error fetching farmer data:', error);
+        // Fetch user data from Firestore
+        const userDocRef = doc(db, 'users', uidToUse);
+        const userDocSnap = await getDoc(userDocRef);
 
-        try {
-          const dummy_data = JSON.parse(localStorage.getItem("mock_userData"));
-          if (dummy_data) {
-            setDisplayData(dummy_data);
-            console.log("Using mock data from localStorage.");
-          } else {
-            const fallbackData = {
-              user: {
-                uid: 'd7m74KoesWRw9bdXceJboC7vbUu1',
-                name: 'Debangshu Chatterjee',
-                email: 'debangshuchatterjee2005@gmail.com',
-                totalLand: 5,
-                crops: ['Wheat', 'Rice', 'Maize'],
-                locationLat: 22.5726,
-                locationLong: 88.3639,
-                isSmallFarmer: true,
-                phone: '6290277345',
-                aadhar: '123456789012',
-              }
-            };
-            setDisplayData(fallbackData);
-            localStorage.setItem("mock_userData", JSON.stringify(fallbackData));
-          }
-        } catch (localStorageError) {
-          console.error('LocalStorage fallback failed:', localStorageError);
+        if (userDocSnap.exists()) {
+          const firestoreData = userDocSnap.data();
+          console.log('Fetched user data from Firestore:', firestoreData);
+
+          // Normalize the data structure
+          const normalizedData = {
+            user: {
+              uid: firestoreData.uid || uidToUse,
+              name: firestoreData.name || firestoreData.firstName + ' ' + firestoreData.lastName || 'User',
+              email: firestoreData.email || '',
+              totalLand: firestoreData.totalLand || firestoreData.landSize || 0,
+              landSize: firestoreData.landSize || firestoreData.totalLand || 0,
+              crops: Array.isArray(firestoreData.crops)
+                ? firestoreData.crops
+                : (typeof firestoreData.crops === 'string'
+                  ? firestoreData.crops.split(',').map(c => c.trim()).filter(c => c)
+                  : []),
+              locationLat: firestoreData.locationLat || firestoreData.location?.lat || '',
+              locationLong: firestoreData.locationLong || firestoreData.location?.long || '',
+              isSmallFarmer: (firestoreData.totalLand || firestoreData.landSize || 0) < 5,
+              phone: firestoreData.phone || '',
+              aadhar: firestoreData.aadhar || firestoreData.aadharNum || '',
+              aadharNum: firestoreData.aadharNum || firestoreData.aadhar || ''
+            }
+          };
+
+          setUserData(normalizedData.user);
+          setDisplayData(normalizedData);
+        } else {
+          console.error('No user document found in Firestore for UID:', uidToUse);
+          alert('User profile not found. Please complete registration.');
         }
+      } catch (error) {
+        console.error('Error fetching user data from Firestore:', error);
+        alert('Failed to load user data. Please try again.');
       }
     });
 
@@ -196,7 +206,7 @@ const FarmerDashboard = ({ user, onLogout }) => {
       unsubscribe();
       console.log('Unsubscribed from Firebase Auth listener.');
     };
-  }, []);
+  }, [id]);
 
   function getRelativeTime(pubDate) {
     const now = new Date();
@@ -214,18 +224,7 @@ const FarmerDashboard = ({ user, onLogout }) => {
     return `Just now`;
   }
 
-  // Safely generate the farmingNews array from newsData
-  useEffect(() => {
-    if (!newsData || !newsData.results) return;
 
-    const mappedNews = newsData.results.slice(0, 10).map((item) => ({
-      title: item.title || "Some_random_title",
-      time: getRelativeTime(item.pubDate),
-      type: newsData.source_name || "general",
-    }));
-
-    setFarmingNews(mappedNews);
-  }, [newsData]);
 
 
   const [weatherForecast, setWeatherForecast] = useState([]);
@@ -277,7 +276,7 @@ const FarmerDashboard = ({ user, onLogout }) => {
   const openEditModal = () => {
     setEditFormData({
       name: displayData.user.name,
-      totalLand: displayData.user.totalLand,
+      totalLand: displayData.user.totalLand || displayData.user.landSize,
       crops: displayData.user.crops.join(', '), // Edit as comma-separated string
       locationLat: displayData.user.locationLat,
       locationLong: displayData.user.locationLong
@@ -352,7 +351,7 @@ const FarmerDashboard = ({ user, onLogout }) => {
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-3">
             <Leaf className="h-8 w-8 text-agricultural-forest-green" />
-            <span className="text-xl font-bold text-agricultural-soil-brown">AgroSure</span>
+            <span className="text-xl font-bold text-agricultural-soil-brown">KisaanSaathi</span>
           </div>
           <div className="flex items-center space-x-3">
             <button

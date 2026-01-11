@@ -32,7 +32,7 @@ const Architecture = () => {
                     <div className="flex justify-between items-center h-20">
                         <Link to="/" className="flex items-center space-x-2">
                             <Leaf className="h-8 w-8 text-green-600" />
-                            <span className="text-xl font-bold text-gray-900">AgroSure</span>
+                            <span className="text-xl font-bold text-gray-900">KisaanSaathi</span>
                         </Link>
                         <Link to="/" className="text-sm font-bold text-gray-900 hover:text-green-600 transition-colors">
                             ← Back to Home
@@ -47,7 +47,7 @@ const Architecture = () => {
                         System <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600">Architecture</span>
                     </h1>
                     <p className="text-xl text-gray-600">
-                        A high-level overview of how AgroSure processes data from the field to provide actionable insights.
+                        A high-level overview of how KisaanSaathi processes data from the field to provide actionable insights.
                     </p>
                 </div>
 

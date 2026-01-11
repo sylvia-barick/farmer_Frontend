@@ -26,7 +26,7 @@ export default function Landing() {
             {/* Simple Footer */}
             <footer className="bg-gray-900 text-white py-12">
                 <div className="container mx-auto px-6 md:px-12 text-center">
-                    <p className="text-gray-400">© 2025 AgroSure. All rights reserved.</p>
+                    <p className="text-gray-400">© 2025 KisaanSaathi. All rights reserved.</p>
                 </div>
             </footer>
         </div>

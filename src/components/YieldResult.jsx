@@ -74,7 +74,7 @@ const YieldResults = ({ results, user, onBackToDashboard }) => {
       // Generate the report HTML
       reportContainer.innerHTML = `
         <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #2d5a27; font-size: 28px; margin-bottom: 10px;">AgroSure</h1>
+          <h1 style="color: #2d5a27; font-size: 28px; margin-bottom: 10px;">KisaanSaathi</h1>
           <h2 style="color: #8b4513; font-size: 24px; margin-bottom: 5px;">Yield Prediction Report</h2>
           <p style="color: #666; font-size: 14px;">Generated on ${new Date().toLocaleDateString()}</p>
         </div>
@@ -150,7 +150,7 @@ const YieldResults = ({ results, user, onBackToDashboard }) => {
         </div>
 
         <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #2d5a27; text-align: center; color: #666; font-size: 12px;">
-          <p><strong>AgroSure</strong> - Empowering Farmers with Data-Backed Financial Support</p>
+          <p><strong>KisaanSaathi</strong> - Empowering Farmers with Data-Backed Financial Support</p>
           <p>Report ID: ${Date.now()} | Valid until: ${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
         </div>
       `;

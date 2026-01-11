@@ -212,33 +212,104 @@ const InsuranceClaim = ({ user, onBack }) => {
 
         textToAnalyze = await readText(formData.policyDocument);
       }
-      // Check for PDF
-      else if (formData.policyDocument.type === 'application/pdf' || formData.policyDocument.name.endsWith('.pdf')) {
-        console.log("Uploading PDF for extraction: ", formData.policyDocument);
-        const formDataToSend = new FormData();
-        formDataToSend.append('policy_file', formData.policyDocument);
+      // Check for images - compress before sending
+      else if (formData.policyDocument.type.startsWith('image/')) {
+        console.log("Processing image file: ", formData.policyDocument);
 
-        // Assuming the extract endpoint works
-        const extractedResponse = await fetch(`${import.meta.env.VITE_FASTAPI_URL}/verify-policy`, {
-          method: 'POST',
-          body: formDataToSend
+        // Compress image to reduce size and avoid 413 errors
+        const compressImage = (file) => new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              const maxWidth = 800;
+              const maxHeight = 800;
+              let width = img.width;
+              let height = img.height;
+
+              if (width > height) {
+                if (width > maxWidth) {
+                  height *= maxWidth / width;
+                  width = maxWidth;
+                }
+              } else {
+                if (height > maxHeight) {
+                  width *= maxHeight / height;
+                  height = maxHeight;
+                }
+              }
+
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, height);
+
+              const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+              resolve(compressedBase64);
+            };
+            img.onerror = reject;
+          };
+          reader.onerror = reject;
         });
 
-        if (!extractedResponse.ok) throw new Error('Failed to extract text from PDF.');
-        textToAnalyze = await extractedResponse.text(); // Or JSON depends on API
+        const compressedImage = await compressImage(formData.policyDocument);
+
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/ai/analyze`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'policy-summary',
+            data: {
+              policyText: "Analyze this insurance policy document from the image.",
+              image: compressedImage
+            }
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to analyze');
+        }
+        const data = await response.json();
+        setGeminiResponse(data.analysis);
+        return;
+      }
+      // Handle PDF files with helpful message
+      else if (formData.policyDocument.type === 'application/pdf' || formData.policyDocument.name.endsWith('.pdf')) {
+        console.log("PDF detected - showing guidance");
+
+        setGeminiResponse(`📄 **PDF Document Detected**
+
+Unfortunately, direct PDF analysis is limited due to file size constraints.
+
+**Alternative Options:**
+1. **Convert to Image**: Screenshot your policy and upload as JPG/PNG
+2. **Copy as Text**: Copy policy text and save as .txt file
+3. **Manual Review**: Review policy manually
+
+**Your Policy Details:**
+- Provider: ${formData.provider || 'N/A'}
+- Policy #: ${formData.policyNumber || 'N/A'}
+- UIN: ${formData.uin || 'N/A'}
+
+Try uploading an image version for AI analysis!`);
+        return;
       }
 
       if (textToAnalyze) {
-        // Use Backend API (Llama 4 Maverick)
+        // Use Backend API (Llama 4 Maverick) for text files
         const response = await analyzePolicy(textToAnalyze);
         setGeminiResponse(response);
       } else {
-        setGeminiResponse('Could not extract text from document.');
+        setGeminiResponse('Could not extract text from document. Please upload a text file, PDF, or image.');
       }
 
     } catch (error) {
       console.error('Error processing document:', error);
-      setGeminiResponse('Failed to process the policy document. Please try again.');
+      setGeminiResponse(`Failed to process the policy document: ${error.message}. Please try again.`);
     } finally {
       setIsLoadingAi(false);
     }

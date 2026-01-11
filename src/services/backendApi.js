@@ -46,13 +46,13 @@ export const sendFeedback = async (originalPrompt, userRating) => {
     }
 };
 
-export const askAI = async (prompt) => {
+export const askAI = async (prompt, lang = 'hi') => {
     try {
-        const response = await api.post('/ai/analyze', { type: 'chat', prompt });
-        return response.data.analysis;
+        const response = await api.post('/ai/analyze', { type: 'chat', prompt, lang });
+        return response.data; // Now returns { success, analysis, ttsUrl }
     } catch (error) {
         console.error('Error fetching AI analysis:', error);
-        return "I apologize, but I'm unable to analyze that right now. Please try again later.";
+        return { analysis: "I apologize, but I'm unable to analyze that right now. Please try again later.", ttsUrl: null };
     }
 };
 
@@ -99,8 +99,8 @@ export const identifyDisease = async (imageFile, description) => {
 export const analyzePolicy = async (text) => {
     try {
         const response = await api.post('/ai/analyze', {
-            type: 'insurance',
-            data: { policyDetails: text, task: 'summary' }
+            type: 'policy-summary',
+            data: { policyText: text }
         });
         return response.data.analysis;
     } catch (error) {
@@ -181,6 +181,29 @@ export const submitYieldPrediction = async (predictionData) => {
         return await analyzeYield(predictionData);
     } catch (error) {
         throw error;
+    }
+};
+
+export const getAgriculturalNews = async () => {
+    try {
+        const response = await api.get('/news');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching agricultural news:', error);
+        return { success: false, data: [] };
+    }
+};
+
+export const getFarmInsights = async (location, crops) => {
+    try {
+        const cropsParam = Array.isArray(crops) ? crops.join(',') : crops;
+        const response = await api.get('/news/insights', {
+            params: { location, crops: cropsParam }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching farm insights:', error);
+        return { success: false, data: [] };
     }
 };
 

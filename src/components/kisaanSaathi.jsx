@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Mic, MessageCircle, Loader2, ThumbsUp, ThumbsDown, X, MessageSquare, Minimize2, Paperclip, FileText, Image as ImageIcon } from "lucide-react";
+import { Send, Mic, MessageSquare, Loader2, Minimize2, Paperclip, Languages } from "lucide-react";
 import { askAI, sendFeedback, identifyDisease, applyLoan, submitInsuranceClaim, submitYieldPrediction } from '../services/backendApi';
 import { auth } from '../utils/firebaseConfig';
-import Groq from "groq-sdk";
 
 const KisaanSaathi = ({ user }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,25 +9,23 @@ const KisaanSaathi = ({ user }) => {
   const [inputValue, setInputValue] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showPulse, setShowPulse] = useState(true);
-  const [hasOpened, setHasOpened] = useState(false);
   const [attachedFile, setAttachedFile] = useState(null);
 
   // Flow State Management
   const [flowState, setFlowState] = useState('IDLE'); // IDLE, LOAN, INSURANCE, YIELD, PLANT_DOCTOR
   const [step, setStep] = useState(0);
   const [flowData, setFlowData] = useState({});
+  const [preferredLang, setPreferredLang] = useState('hi'); // Default Hindi
 
-  const recognitionRef = useRef(null);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
+  const toggleLang = () => {
+    setPreferredLang(prev => prev === 'hi' ? 'en' : 'hi');
+  };
+
   const toggleChat = () => {
     setIsOpen(!isOpen);
-    if (!isOpen) {
-      setHasOpened(true);
-      setShowPulse(false);
-    }
   };
 
   const scrollToBottom = () => {
@@ -39,7 +36,13 @@ const KisaanSaathi = ({ user }) => {
     scrollToBottom();
   }, [chats, isOpen]);
 
-  const speakText = (text, lang = 'hi-IN') => {
+  const speakText = (text, ttsUrl, lang = preferredLang === 'hi' ? 'hi-IN' : 'en-US') => {
+    if (ttsUrl) {
+      const audio = new Audio(ttsUrl);
+      audio.play().catch(e => console.warn("TTS Playback failed:", e));
+      return;
+    }
+
     if (!text || typeof window === 'undefined' || !window.speechSynthesis) return;
     text = text.replace(/\*\*(.*?)\*\*/g, '$1');
     const speakNow = () => {
@@ -58,19 +61,57 @@ const KisaanSaathi = ({ user }) => {
     }
   };
 
-  const addMessage = (query, type, originalQuery = '', attachment = null) => {
-    setChats(prev => [...prev, { query, type, originalQuery, attachment }]);
-    if (type === 'response') speakText(query);
+  const addMessage = (query, type, originalQuery = '', attachment = null, ttsUrl = null) => {
+    setChats(prev => [...prev, { query, type, originalQuery, attachment, ttsUrl }]);
+    if (type === 'response') speakText(query, ttsUrl);
   };
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setAttachedFile(file);
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() && !attachedFile) return;
+
+    const currentInput = inputValue;
+    const currentFile = attachedFile;
+
+    addMessage(currentInput || (currentFile ? `[File: ${currentFile.name}]` : ''), 'query', '', currentFile);
+    setInputValue('');
+    setAttachedFile(null);
+    setIsLoading(true);
+
+    try {
+      let responseData = { analysis: "", ttsUrl: null };
+
+      if (flowState !== 'IDLE') {
+        const result = await handleFlowInput(currentInput, currentFile);
+        responseData.analysis = result;
+      } else {
+        const intent = detectIntent(currentInput);
+        if (intent) {
+          startFlow(intent);
+          setIsLoading(false);
+          return;
+        } else {
+          responseData = await askAI(currentInput, preferredLang);
+        }
+      }
+
+      addMessage(responseData.analysis, 'response', currentInput, null, responseData.ttsUrl);
+
+    } catch (error) {
+      console.error('Chatbot error:', error);
+      addMessage(`❌ Sorry, something went wrong: ${error.message}`, 'response');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // --- FLOW LOGIC ---
+  const detectIntent = (text) => {
+    const lower = text.toLowerCase();
+    if (lower.includes('loan') || lower.includes('money') || lower.includes('credit')) return 'LOAN';
+    if (lower.includes('insurance') || lower.includes('claim') || lower.includes('policy')) return 'INSURANCE';
+    if (lower.includes('yield') || lower.includes('harvest') || lower.includes('production')) return 'YIELD';
+    if (lower.includes('plant') || lower.includes('disease') || lower.includes('doctor') || lower.includes('crop health')) return 'PLANT_DOCTOR';
+    return null;
+  };
 
   const startFlow = (flowName) => {
     setFlowState(flowName);
@@ -80,400 +121,319 @@ const KisaanSaathi = ({ user }) => {
     let prompt = "";
     switch (flowName) {
       case 'LOAN':
-        prompt = "I can help you apply for a loan. First, what is the **purpose** of the loan? (e.g., Crop Cultivation, Equipment)";
+        prompt = "🏦 I can help you apply for a loan!\n\nFirst, what is the **purpose** of the loan?\n(e.g., Crop Cultivation, Equipment Purchase, Seeds)";
         break;
       case 'INSURANCE':
-        prompt = "For insurance claims, I need a few details. Which **Insurance Provider** is your policy with?";
+        prompt = "🛡️ Let's file an insurance claim.\n\nWhich **Insurance Provider** is your policy with?\n(e.g., AIC, IFFCO Tokio, Bajaj Allianz)";
         break;
       case 'YIELD':
-        prompt = "Let's predict your crop yield. What **type of crop** are you growing?";
+        prompt = "🌾 Let's predict your crop yield!\n\nWhat **type of crop** are you growing?\n(e.g., Rice, Wheat, Cotton)";
         break;
       case 'PLANT_DOCTOR':
-        prompt = "I can diagnose plant diseases. Please **upload a photo** of the affected plant. (Optional: Add a description)";
+        prompt = "🚑 I can diagnose plant diseases.\n\nPlease **upload a photo** of the affected plant using the attachment button (📎).";
         break;
       default:
-        prompt = "How can I help you?";
+        prompt = "How can I help you today?";
     }
 
     setTimeout(() => addMessage(prompt, 'response'), 500);
   };
 
-  const executeYieldPredictionGroq = async (data) => {
-    // Direct call to Groq similar to YieldPredictionForm
-    const groq = new Groq({
-      apiKey: import.meta.env.VITE_GROQ_API_KEY,
-      dangerouslyAllowBrowser: true
-    });
-    const systemPrompt = `You are an expert agronomist. Analyze the crop and farm data provided and generate a detailed yield prediction. 
-          RETURN JSON ONLY. The JSON must match this structure exactly:
-          {
-            "predictedYieldKgPerAcre": number,
-            "yieldCategory": "High" | "Medium" | "Low",
-            "soilHealthScore": number (0-100),
-            "soilHealthCategory": string,
-            "climateScore": number (0-100),
-            "suggestedCrops": [ { "cropName": string, "predictedYieldKgPerHa": number } ]
-          }`;
-    const userPrompt = `Crop: ${data.crop}, Acres: ${data.acres}, Planting Date: ${data.plantingDate}`;
-
-    const chatCompletion = await groq.chat.completions.create({
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt }
-      ],
-      model: "openai/gpt-oss-120b",
-      temperature: 1,
-      max_completion_tokens: 4096,
-    });
-    const content = chatCompletion.choices[0]?.message?.content || "{}";
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    const jsonString = jsonMatch ? jsonMatch[0] : content;
-    return JSON.parse(jsonString);
-  };
-
   const handleFlowInput = async (input, file) => {
     const currentStep = step;
+    const lowerInput = input.toLowerCase();
 
-    // -- LOAN FLOW --
+    // Handle cancellation
+    if (lowerInput.includes('cancel') || lowerInput.includes('stop') || lowerInput.includes('exit')) {
+      setFlowState('IDLE');
+      setFlowData({});
+      setStep(0);
+      return "❌ Process cancelled. How else can I help you?";
+    }
+
+    // LOAN FLOW
     if (flowState === 'LOAN') {
-      if (currentStep === 1) { // Purpose
+      if (currentStep === 1) {
         setFlowData({ ...flowData, purpose: input });
         setStep(2);
-        return "Which **Crop** is this loan for? (e.g., Wheat, Rice)";
-      } else if (currentStep === 2) { // Crop
+        return "What **Crop** is this loan for?";
+      }
+      if (currentStep === 2) {
         setFlowData({ ...flowData, crop: input });
         setStep(3);
-        return "Got it. How much **amount** (in ₹) do you need?";
-      } else if (currentStep === 3) { // Amount
-        setFlowData({ ...flowData, amount: input });
+        return "How much **amount** (in ₹) do you need?";
+      }
+      if (currentStep === 3) {
+        const amount = parseFloat(input.replace(/[^\d.]/g, ''));
+        if (isNaN(amount) || amount <= 0) {
+          return "⚠️ Please enter a valid amount in numbers (e.g., 50000)";
+        }
+        setFlowData({ ...flowData, amount: amount });
         setStep(4);
-        return "And for how many **years** (tenure)?";
-      } else if (currentStep === 4) { // Tenure -> Submit
-        console.log("Submitting Loan. User Data:", user);
-
-        const loanPayload = {
-          farmerUid: auth.currentUser?.uid,
-          farmerName: auth.currentUser?.displayName || user?.name || "Farmer",
-          loanPurpose: flowData.purpose,
-          requestedAmount: Number(flowData.amount),
-          tenureMonths: parseInt(input) * 12 || 12,
-          cropType: flowData.crop || "General",
-          acres: user?.totalLand || 0,
-          farmLocation: {
-            lat: Number(user?.locationLat) || 22.5726,
-            lng: Number(user?.locationLong) || 88.3639
-          }
-        };
-
-        console.log("Loan Payload:", loanPayload);
+        return "For how many **years** repayment period? (1-10 years)";
+      }
+      if (currentStep === 4) {
+        const years = parseInt(input);
+        if (isNaN(years) || years < 1 || years > 10) {
+          return "⚠️ Please enter a valid number of years between 1 and 10";
+        }
 
         try {
-          await applyLoan(loanPayload);
+          const loanData = {
+            farmerUid: auth.currentUser?.uid || user?.uid,
+            loanPurpose: flowData.purpose,
+            requestedAmount: flowData.amount,
+            tenureMonths: years * 12,
+            cropType: flowData.crop,
+            landSize: user?.totalLand || user?.landSize || 5
+          };
+
+          await applyLoan(loanData);
           setFlowState('IDLE');
-          return `✅ **Loan Application Submitted!**\n\nI have successfully submitted your application for **₹${flowData.amount}** for **${flowData.crop}** cultivation.\n\nYou can track the status in your Dashboard.`;
+          setFlowData({});
+          setStep(0);
+          return `✅ **Loan Application Submitted Successfully!**\n\n📋 Details:\n💰 Amount: ₹${flowData.amount.toLocaleString('en-IN')}\n🎯 Purpose: ${flowData.purpose}\n🌾 Crop: ${flowData.crop}\n⏱️ Duration: ${years} years\n\nYour application is under review. You'll be notified soon!`;
         } catch (e) {
-          console.error("Loan Submission Error:", e);
+          console.error('Loan submission error:', e);
           setFlowState('IDLE');
-          const errorMsg = e.response?.data?.message || e.message || "Unknown error";
-          return `❌ **Submission Failed**\n\nError: ${errorMsg}\n\nPlease try applying directly from the Loan page.`;
+          setFlowData({});
+          setStep(0);
+          return `❌ **Submission Failed**\n\n${e.message}\nPlease try again or contact support.`;
         }
       }
     }
 
-    // -- YIELD FLOW --
+    // YIELD PREDICTION FLOW
     if (flowState === 'YIELD') {
-      if (currentStep === 1) { // Crop
+      if (currentStep === 1) {
         setFlowData({ ...flowData, crop: input });
         setStep(2);
         return "How many **acres** of land?";
-      } else if (currentStep === 2) {
-        setFlowData({ ...flowData, acres: input });
+      }
+      if (currentStep === 2) {
+        const acres = parseFloat(input.replace(/[^\d.]/g, ''));
+        if (isNaN(acres) || acres <= 0) {
+          return "⚠️ Please enter a valid number of acres (e.g., 5 or 2.5)";
+        }
+        setFlowData({ ...flowData, acres: acres });
         setStep(3);
-        return "When did you **plant** the crop? (e.g., 2024-06-01)";
-      } else if (currentStep === 3) {
+        return "What is the **soil type**?\n(Clay / Sandy / Loamy / Black)";
+      }
+      if (currentStep === 3) {
+        setFlowData({ ...flowData, soilType: input });
+        setStep(4);
+        return "What **season** are you planting in?\n(Kharif / Rabi / Zaid)";
+      }
+      if (currentStep === 4) {
         try {
-          // Call Groq AI for prediction
-          const result = await executeYieldPredictionGroq({
+          const yieldData = {
             crop: flowData.crop,
-            acres: flowData.acres,
-            plantingDate: input
-          });
+            area: flowData.acres,
+            soilType: flowData.soilType,
+            season: input,
+            rainfall: 800,
+            temperature: 25,
+            humidity: 65
+          };
 
+          const prediction = await submitYieldPrediction(yieldData);
           setFlowState('IDLE');
-          return `🌾 **Yield Prediction Report**\n\n**Expected Yield:** ${result.predictedYieldKgPerAcre} kg/acre\n**Category:** ${result.yieldCategory}\n**Soil Health:** ${result.soilHealthCategory} (${result.soilHealthScore}%)\n**Climate Score:** ${result.climateScore}%\n\nI recommend planting **${result.suggestedCrops?.[0]?.cropName || 'similar crops'}** next season for better results.`;
+          setFlowData({});
+          setStep(0);
+          return `🌾 **Yield Prediction Results**\n\n${prediction}\n\n📊 Input Data:\n🌱 Crop: ${flowData.crop}\n📏 Area: ${flowData.acres} acres\n🌍 Soil: ${flowData.soilType}\n🌦️ Season: ${input}`;
         } catch (e) {
+          console.error('Yield prediction error:', e);
           setFlowState('IDLE');
-          return "⚠️ I couldn't generate the yield report right now. Please try the Yield Prediction page.";
+          setFlowData({});
+          setStep(0);
+          return `⚠️ **Prediction Failed**\n\n${e.message}\nPlease try again with valid data.`;
         }
       }
     }
 
-    // -- PLANT DOCTOR FLOW --
+    // PLANT DOCTOR FLOW
     if (flowState === 'PLANT_DOCTOR') {
       if (currentStep === 1) {
         if (file) {
-          setIsLoading(true);
           try {
-            // Direct Groq Call with Llama 4 Maverick
-            const groq = new Groq({
-              apiKey: import.meta.env.VITE_GROQ_API_KEY,
-              dangerouslyAllowBrowser: true
-            });
-
-            const toBase64 = (file) => new Promise((resolve, reject) => {
-              const reader = new FileReader();
-              reader.readAsDataURL(file);
-              reader.onload = () => resolve(reader.result);
-              reader.onerror = error => reject(error);
-            });
-
-            const base64Image = await toBase64(file);
-            const userDesc = input || "Analyze this plant image for diseases.";
-
-            const messages = [
-              {
-                role: "user",
-                content: [
-                  { type: "text", text: userDesc },
-                  { type: "image_url", image_url: { url: base64Image } }
-                ]
-              }
-            ];
-
-            const chatCompletion = await groq.chat.completions.create({
-              messages: messages,
-              model: "meta-llama/llama-4-maverick-17b-128e-instruct",
-              temperature: 1,
-              max_completion_tokens: 1024,
-              top_p: 1,
-              stream: true,
-              stop: null
-            });
-
-            let fullResponse = "";
-            for await (const chunk of chatCompletion) {
-              fullResponse += chunk.choices[0]?.delta?.content || '';
-            }
-
+            const diagnosis = await identifyDisease(file, input || "Analyze this plant image and identify any diseases or problems.");
             setFlowState('IDLE');
-            setIsLoading(false);
-            return `🚑 **Plant Diagnosis Report**\n\n${fullResponse}\n\nI have recorded this diagnosis. View full details in the Plant Doctor section.`;
+            setFlowData({});
+            setStep(0);
+            return `🚑 **Plant Diagnosis Report**\n\n${diagnosis}\n\n💡 **Tip**: Follow the recommendations carefully for best results!`;
           } catch (e) {
+            console.error('Disease diagnosis error:', e);
             setFlowState('IDLE');
-            setIsLoading(false);
-            return "❌ Failed to diagnose. Please check your internet connection or try a different image.";
+            setFlowData({});
+            setStep(0);
+            return `❌ **Diagnosis Failed**\n\n${e.message}\nPlease upload a clear image of the affected plant.`;
           }
         } else {
-          return "Please upload an image for diagnosis.";
+          return "📷 Please **upload an image** of the affected plant using the attachment button (📎).";
         }
       }
     }
 
-    // -- INSURANCE FLOW --
+    // INSURANCE CLAIM FLOW
     if (flowState === 'INSURANCE') {
       if (currentStep === 1) {
         setFlowData({ ...flowData, provider: input });
         setStep(2);
-        return "What is your **Policy Number**?";
-      } else if (currentStep === 2) {
-        setFlowData({ ...flowData, policyNumber: input });
+        return "What is your **UIN** (Unique Identification Number)?";
+      }
+      if (currentStep === 2) {
+        setFlowData({ ...flowData, uin: input });
         setStep(3);
-        return "Please **upload your Policy Document** (or just type 'skip' if you don't have it handy).";
-      } else if (currentStep === 3) {
-        const formData = new FormData();
-        formData.append('uid', auth.currentUser?.uid);
-        formData.append('provider', flowData.provider);
-        formData.append('policyNumber', flowData.policyNumber);
-        formData.append('uin', 'N/A-CHATBOT'); // Default
-        if (file) formData.append('policyDoc', file);
-
-        try {
-          await submitInsuranceClaim(formData);
-          setFlowState('IDLE');
-          return `✅ **Insurance Claim Submitted!**\n\nClaim for **${flowData.provider}** (Policy: ${flowData.policyNumber}) has been filed.\n\nOur team will review the documents.`;
-        } catch (e) {
-          setFlowState('IDLE');
-          return "❌ Submission Failed. Please ensure all details are correct or try later.";
-        }
+        return "What is your **Policy Number**?";
       }
-    }
+      if (currentStep === 3) {
+        setFlowData({ ...flowData, policyNumber: input });
+        setStep(4);
+        return "Please **upload damage photo** using the attachment button (📎)\n\nOr type 'skip' to submit without photo.";
+      }
+      if (currentStep === 4) {
+        if (lowerInput === 'skip' && !file) {
+          // Submit without file
+          try {
+            const fd = new FormData();
+            fd.append('uid', auth.currentUser?.uid || user?.uid);
+            fd.append('provider', flowData.provider);
+            fd.append('uin', flowData.uin);
+            fd.append('policyNumber', flowData.policyNumber);
 
-    return "I didn't catch that. Can you repeat?";
-  };
+            await submitInsuranceClaim(fd);
+            setFlowState('IDLE');
+            setFlowData({});
+            setStep(0);
+            return `✅ **Insurance Claim Submitted!**\n\n📋 Details:\n🏢 Provider: ${flowData.provider}\n🆔 UIN: ${flowData.uin}\n📝 Policy: ${flowData.policyNumber}\n\nYour claim is under review.`;
+          } catch (e) {
+            console.error('Insurance claim error:', e);
+            setFlowState('IDLE');
+            setFlowData({});
+            setStep(0);
+            return `❌ **Claim Failed**\n\n${e.message}`;
+          }
+        } else if (file) {
+          try {
+            const fd = new FormData();
+            fd.append('uid', auth.currentUser?.uid || user?.uid);
+            fd.append('provider', flowData.provider);
+            fd.append('uin', flowData.uin);
+            fd.append('policyNumber', flowData.policyNumber);
+            fd.append('damagePhoto', file);
 
-  const detectIntent = (text) => {
-    const lower = text.toLowerCase();
-    if (lower.includes('loan') || lower.includes('money') || lower.includes('credit')) return 'LOAN';
-    if (lower.includes('insurance') || lower.includes('claim') || lower.includes('policy')) return 'INSURANCE';
-    if (lower.includes('yield') || lower.includes('harvest') || lower.includes('production')) return 'YIELD';
-    if (lower.includes('plant') || lower.includes('disease') || lower.includes('sick') || lower.includes('doctor')) return 'PLANT_DOCTOR';
-    return null;
-  };
-
-  const handleSendMessage = async () => {
-    if (!inputValue.trim() && !attachedFile) return;
-
-    const currentInput = inputValue;
-    const currentFile = attachedFile;
-
-    addMessage(currentInput, 'query', '', currentFile);
-    setInputValue('');
-    setAttachedFile(null);
-    setIsLoading(true);
-
-    try {
-      let responseText = "";
-
-      if (flowState !== 'IDLE') {
-        responseText = await handleFlowInput(currentInput, currentFile);
-      } else {
-        const intent = detectIntent(currentInput);
-        if (intent) {
-          startFlow(intent);
-          setIsLoading(false);
-          return;
+            await submitInsuranceClaim(fd);
+            setFlowState('IDLE');
+            setFlowData({});
+            setStep(0);
+            return `✅ **Insurance Claim Submitted Successfully!**\n\n📋 Details:\n🏢 Provider: ${flowData.provider}\n🆔 UIN: ${flowData.uin}\n📝 Policy: ${flowData.policyNumber}\n📸 Damage Photo: Attached\n\nYour claim is under review. Track status in the Insurance Claims section.`;
+          } catch (e) {
+            console.error('Insurance claim error:', e);
+            setFlowState('IDLE');
+            setFlowData({});
+            setStep(0);
+            return `❌ **Claim Submission Failed**\n\n${e.message}\nPlease try again or submit through the Insurance Claim form.`;
+          }
         } else {
-          const query_text = await translateHindiToEnglish(currentInput);
-          const answer = await askAI(query_text);
-          responseText = await translateEnglishToHindi(answer);
+          return "Please upload a damage photo or type 'skip' to continue without it.";
         }
       }
-
-      addMessage(responseText, 'response', currentInput);
-
-    } catch (error) {
-      addMessage("Sorry, something went wrong. Please try again.", 'response');
-    } finally {
-      setIsLoading(false);
     }
+
+    return "I didn't understand that. Can you try again?";
   };
 
-  // --- Translation Helpers ---
-  const translateHindiToEnglish = async (text) => {
-    if (!text) return '';
-    try {
-      const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=hi&tl=en&dt=t&q=${encodeURIComponent(text)}`);
-      const data = await res.json();
-      return data[0]?.map((part) => part[0]).join('') || '';
-    } catch { return text; }
-  };
-
-  const translateEnglishToHindi = async (text) => {
-    if (!text) return '';
-    try {
-      const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=hi&dt=t&q=${encodeURIComponent(text)}`);
-      const data = await res.json();
-      return data[0]?.map((part) => part[0]).join('') || '';
-    } catch { return text; }
-  };
-
-  // --- Speech ---
   const startListening = () => {
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.lang = 'hi-IN';
-      recognitionRef.current.onstart = () => setIsListening(true);
-      recognitionRef.current.onresult = (event) => {
-        setInputValue(event.results[0][0].transcript);
-        setIsListening(false);
-      };
-      recognitionRef.current.onend = () => setIsListening(false);
-      recognitionRef.current.start();
+    if ('webkitSpeechRecognition' in window) {
+      const r = new window.webkitSpeechRecognition();
+      r.lang = preferredLang === 'hi' ? 'hi-IN' : 'en-US';
+      r.onstart = () => setIsListening(true);
+      r.onresult = (e) => { setInputValue(e.results[0][0].transcript); setIsListening(false); };
+      r.onend = () => setIsListening(false);
+      r.start();
     } else {
-      alert('Speech recognition not supported');
+      alert('Speech recognition not supported in your browser');
     }
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') handleSendMessage();
-  };
-
-  const handleFeedback = async (originalQuery, rating) => {
-    await sendFeedback(originalQuery, rating);
   };
 
   return (
     <div className="fixed bottom-6 right-6 z-50 font-sans">
-
-      {/* Launch Button */}
       {!isOpen && (
-        <button onClick={toggleChat} className="relative group">
-          <div className={`absolute -inset-2 bg-yellow-400 border-4 border-black ${showPulse ? 'animate-ping opacity-75' : 'opacity-0'}`}></div>
-          <div className="relative bg-blue-600 hover:bg-red-600 text-white p-4 border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 transition-all flex items-center justify-center">
-            <MessageSquare className="h-8 w-8" />
-          </div>
+        <button
+          onClick={toggleChat}
+          className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 transition-all"
+        >
+          <MessageSquare className="h-8 w-8" />
         </button>
       )}
 
-      {/* Chat Window */}
       {isOpen && (
-        <div className="bg-white w-[350px] sm:w-[400px] h-[500px] sm:h-[600px] flex flex-col border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] animate-in slide-in-from-bottom-10 fade-in duration-300">
-
-          {/* Header */}
-          <div className="bg-yellow-400 border-b-4 border-black p-4 flex justify-between items-center select-none">
-            <div className="flex items-center gap-3">
-              <div className="bg-black p-1.5 border-2 border-white">
-                <MessageCircle className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <h3 className="font-black text-xl uppercase tracking-tighter text-black leading-none">Kisaan Saathi</h3>
-                <span className="text-xs font-bold text-black border-t-2 border-black pt-0.5 inline-block mt-0.5 uppercase">
-                  {flowState === 'IDLE' ? 'AI Assistant' : `${flowState.replace('_', ' ')} MODE`}
-                </span>
-              </div>
+        <div className="bg-white w-[380px] h-[600px] flex flex-col border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] rounded-lg overflow-hidden">
+          <div className="bg-gradient-to-r from-green-400 to-blue-500 border-b-4 border-black p-4 flex justify-between items-center">
+            <div className="flex flex-col">
+              <h3 className="font-black text-2xl uppercase text-white drop-shadow-lg">🌾 Kisaan Saathi</h3>
+              <span
+                className="text-[10px] font-black uppercase text-white/90 flex items-center gap-1 cursor-pointer hover:text-yellow-300 transition-colors"
+                onClick={toggleLang}
+              >
+                <Languages className="h-3 w-3" />
+                {preferredLang === 'hi' ? 'Hindi (हिन्दी)' : 'English'} - Click to Toggle
+              </span>
             </div>
-            <button onClick={toggleChat} className="bg-red-600 text-white p-1 hover:bg-black border-2 border-black transition-colors">
+            <button
+              onClick={toggleChat}
+              className="bg-red-600 text-white p-2 rounded border-2 border-black hover:bg-red-700 transition-colors"
+            >
               <Minimize2 className="h-5 w-5" />
             </button>
           </div>
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-stone-100 custom-scrollbar relative">
-            {chats.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center p-6 opacity-60">
-                <MessageCircle className="h-16 w-16 text-stone-400 mb-4" />
-                <p className="font-black text-2xl text-stone-400 uppercase">Start Chatting</p>
-                <p className="font-bold text-stone-400 text-sm mb-4">Try: "Apply for Loan" or "Check Plant Disease"</p>
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gradient-to-b from-stone-50 to-stone-100">
+            {chats.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                <p className="font-bold mb-2">👋 Welcome to Kisaan Saathi!</p>
+                <p className="text-sm">I can help you with:</p>
+                <ul className="text-xs mt-2 space-y-1">
+                  <li>🏦 Loan Applications</li>
+                  <li>🛡️ Insurance Claims</li>
+                  <li>🌾 Yield Predictions</li>
+                  <li>🚑 Plant Disease Diagnosis</li>
+                  <li>❓ General farming queries</li>
+                </ul>
               </div>
-            ) : (
-              chats.map((chat, index) => (
-                <div key={index} className={`flex flex-col ${chat.type === 'query' ? 'items-end' : 'items-start'}`}>
-                  <div className={`max-w-[85%] p-3 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${chat.type === 'query' ? 'bg-blue-600 text-white rounded-none ml-8' : 'bg-white text-black rounded-none mr-8'
-                    }`}>
-                    {chat.attachment && (
-                      <div className="mb-2 p-1 bg-black/20 rounded text-xs flex items-center gap-2">
-                        <Paperclip className="h-3 w-3" /> {chat.attachment.name}
-                      </div>
-                    )}
-                    <p className="whitespace-pre-wrap text-sm leading-relaxed">{chat.query}</p>
-                  </div>
-                  {chat.type === 'response' && (
-                    <div className="flex gap-2 mt-1 ml-1 scale-75 origin-left opacity-0 animate-in fade-in duration-300 fill-mode-forwards" style={{ animationDelay: '0.3s' }}>
-                      <button onClick={() => handleFeedback(chat.originalQuery, 5)} className="p-1 hover:bg-green-200 border border-black bg-white"><ThumbsUp className="h-3 w-3" /></button>
-                      <button onClick={() => handleFeedback(chat.originalQuery, 1)} className="p-1 hover:bg-red-200 border border-black bg-white"><ThumbsDown className="h-3 w-3" /></button>
-                    </div>
+            )}
+            {chats.map((chat, index) => (
+              <div key={index} className={`flex flex-col ${chat.type === 'query' ? 'items-end' : 'items-start'}`}>
+                <div className={`max-w-[85%] p-3 font-semibold text-sm border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] rounded-lg ${chat.type === 'query'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-white text-black'
+                  }`}>
+                  <p className="whitespace-pre-wrap">{chat.query}</p>
+                  {chat.attachment && (
+                    <p className="text-xs mt-1 opacity-75">📎 {chat.attachment.name}</p>
                   )}
                 </div>
-              ))
-            )}
+              </div>
+            ))}
             {isLoading && (
-              <div className="flex justify-start w-full">
-                <div className="bg-yellow-400 border-2 border-black p-3 flex items-center gap-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="font-black text-xs uppercase">Processing...</span>
-                </div>
+              <div className="flex items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                <span className="ml-2 text-sm font-bold text-gray-600">Thinking...</span>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input Area */}
-          <div className="p-4 bg-white border-t-4 border-black">
+          <div className="p-3 bg-white border-t-4 border-black">
             {attachedFile && (
-              <div className="flex items-center justify-between bg-stone-100 p-2 mb-2 border-2 border-dashed border-black">
-                <span className="text-xs font-bold truncate max-w-[200px]">{attachedFile.name}</span>
-                <button onClick={() => setAttachedFile(null)}><X className="h-4 w-4 text-red-600" /></button>
+              <div className="mb-2 p-2 bg-blue-50 border-2 border-blue-300 rounded flex items-center justify-between">
+                <span className="text-xs font-bold truncate">📎 {attachedFile.name}</span>
+                <button
+                  onClick={() => setAttachedFile(null)}
+                  className="text-red-600 hover:text-red-800"
+                >
+                  ×
+                </button>
               </div>
             )}
             <div className="flex gap-2">
@@ -481,37 +441,36 @@ const KisaanSaathi = ({ user }) => {
                 type="file"
                 ref={fileInputRef}
                 className="hidden"
-                onChange={handleFileUpload}
+                accept="image/*"
+                onChange={(e) => setAttachedFile(e.target.files[0])}
               />
               <button
                 onClick={() => fileInputRef.current.click()}
-                className="p-3 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:bg-stone-100 transition-all bg-white"
-                title="Upload File"
+                className="p-2 border-2 border-black bg-white hover:bg-gray-100 rounded transition-colors"
+                title="Attach file"
               >
                 <Paperclip className="h-5 w-5" />
               </button>
-
               <button
                 onClick={startListening}
-                className={`p-3 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none transition-all ${isListening ? 'bg-red-600 text-white animate-pulse' : 'bg-white hover:bg-stone-100'}`}
+                className={`p-2 border-2 border-black rounded transition-colors ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-white hover:bg-gray-100'
+                  }`}
+                title="Voice input"
               >
                 <Mic className="h-5 w-5" />
               </button>
-
               <input
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder={flowState === 'PLANT_DOCTOR' && step === 1 ? "Upload photo..." : "Type a message..."}
-                className="flex-1 border-2 border-black px-3 font-bold text-sm focus:outline-none focus:bg-yellow-50 placeholder:text-stone-400"
-                disabled={isListening}
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                placeholder="Type your message..."
+                className="flex-1 border-2 border-black px-3 py-2 font-medium rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-
               <button
                 onClick={handleSendMessage}
-                disabled={(!inputValue.trim() && !attachedFile) || isLoading}
-                className="bg-black text-white p-3 border-2 border-black hover:bg-stone-800 disabled:opacity-50 transition-colors"
+                disabled={isLoading}
+                className="bg-blue-600 text-white p-2 border-2 border-black rounded shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send className="h-5 w-5" />
               </button>

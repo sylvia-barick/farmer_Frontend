@@ -173,7 +173,7 @@ const LoanApplication = ({ user, onBack }) => {
     doc.rect(0, 0, 210, 40, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(24);
-    doc.text("AgroSure Loan Application", 105, 25, null, null, "center");
+    doc.text("KisaanSaathi Loan Application", 105, 25, null, null, "center");
 
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(14);
@@ -197,7 +197,7 @@ const LoanApplication = ({ user, onBack }) => {
     doc.text(`Selected Crop: ${selectedCrop ? selectedCrop.cropName : "None"}`, 20, 140);
 
     // Save
-    doc.save("AgroSure_Loan_Application.pdf");
+    doc.save("KisaanSaathi_Loan_Application.pdf");
   };
 
   if (showStatus) {
