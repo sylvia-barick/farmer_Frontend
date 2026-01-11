@@ -54,8 +54,17 @@ const PlantDisease = ({ onBack }) => {
         try {
             // Direct Groq Call as requested
             const Groq = (await import("groq-sdk")).Groq;
+
+            // Fetch API Key from backend
+            const response = await fetch(`${import.meta.env.VITE_MAIN_BACKEND_URL || 'http://localhost:5000/api'}/config/groq`);
+            const data = await response.json();
+
+            if (!data.success || !data.apiKey) {
+                throw new Error("Failed to retrieve API configuration from backend");
+            }
+
             const groq = new Groq({
-                apiKey: import.meta.env.VITE_GROQ_API_KEY,
+                apiKey: data.apiKey,
                 dangerouslyAllowBrowser: true
             });
 

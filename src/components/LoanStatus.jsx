@@ -18,6 +18,9 @@ const LoanStatus = ({ user, onBack }) => {
                 return;
             }
 
+            // If we have data but it differs from current user, or if we are loading initial data
+            setIsLoading(true);
+
             try {
                 console.log(`Fetching loans for UID: ${uid}`);
                 const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/loan/user/${uid}`);
@@ -37,7 +40,7 @@ const LoanStatus = ({ user, onBack }) => {
         };
 
         fetchUserLoans();
-    }, [user]);
+    }, [user, user?.uid]);
 
     const getStatusColor = (status) => {
         switch (status) {

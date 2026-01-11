@@ -16,6 +16,8 @@ const InsuranceStatus = ({ user, onBack }) => {
                 return;
             }
 
+            setIsLoading(true);
+
             try {
                 console.log(`Fetching insurance claims for UID: ${uid}`);
                 const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/insurance/user/${uid}`);
@@ -35,7 +37,7 @@ const InsuranceStatus = ({ user, onBack }) => {
         };
 
         fetchUserClaims();
-    }, [user]);
+    }, [user, user?.uid]);
 
     const getStatusColor = (status) => {
         switch (status?.toUpperCase()) {

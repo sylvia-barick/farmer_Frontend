@@ -9,18 +9,23 @@ const PastReports = ({ user, onBack }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchHistory = async () => {
-    if (!auth.currentUser) return;
+    const uid = user?.uid || auth.currentUser?.uid;
+    if (!uid) {
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     try {
       // Fetch Yield History
-      const yieldRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/crop/getAllCrops/${auth.currentUser.uid}`);
+      const yieldRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/crop/getAllCrops/${uid}`);
       const yieldData = await yieldRes.json();
       if (yieldData.success) {
         setYieldClaimHistory(yieldData.cropRecord || []);
       }
 
       // Fetch Insurance History
-      const insRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/insurance/user/${auth.currentUser.uid}`);
+      const insRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/insurance/user/${uid}`);
       const insData = await insRes.json();
       if (insData.success) {
         setInsuranceHistory(insData.claims || []);
@@ -34,7 +39,7 @@ const PastReports = ({ user, onBack }) => {
 
   useEffect(() => {
     fetchHistory();
-  }, []);
+  }, [user]);
 
   const handleDeleteYield = async (id) => {
     if (!window.confirm("Are you sure you want to delete this record?")) return;
