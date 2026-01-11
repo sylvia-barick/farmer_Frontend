@@ -41,8 +41,8 @@ The official farmer-facing frontend for **KisaanSaathi**, a next-generation AI-p
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/deba2k5/agri_front.git
-cd agri_front/KisaanSaathi_main_frontend/frontend
+git clone https://github.com/sylvia-barick/KisaanSathi-Frontend.git
+cd KisaanSathi-Frontend
 ```
 
 ### 2. Install Dependencies

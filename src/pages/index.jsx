@@ -93,7 +93,7 @@ const Index = () => {
             <div className="hidden md:flex items-center space-x-8">
               <span className="text-gray-600 hover:text-green-600 font-medium text-sm transition-colors cursor-pointer">Dashboard</span>
               <Link to="/architecture" className="text-gray-600 hover:text-green-600 font-medium text-sm transition-colors">Architecture</Link>
-              <a href="https://github.com/deba2k5/agri_front" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-green-600 font-medium text-sm transition-colors">GitHub</a>
+              <a href="https://github.com/sylvia-barick/KisaanSathi-Frontend" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-green-600 font-medium text-sm transition-colors">GitHub</a>
             </div>
 
             <div className="flex items-center space-x-4">
