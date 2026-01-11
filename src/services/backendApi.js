@@ -105,6 +105,55 @@ export const executeMastraWorkflow = async (workflowName, input, userId) => {
     }
 };
 
+/**
+ * Transcribe audio using Whisper Large V3 Turbo
+ * @param {string} base64Audio - Base64 encoded audio data
+ * @param {string} mimeType - Audio MIME type (default: 'audio/webm')
+ * @param {string} language - Language code ('hi' for Hindi, 'en' for English)
+ * @returns {Promise<Object>} - { success, text, language, duration }
+ */
+export const transcribeAudio = async (base64Audio, mimeType = 'audio/webm', language = 'hi') => {
+    try {
+        const response = await api.post('/speech/transcribe-base64', {
+            audio: base64Audio,
+            mimeType,
+            language
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error transcribing audio:', error);
+        return {
+            success: false,
+            text: '',
+            error: error.message
+        };
+    }
+};
+
+/**
+ * Convert text to speech using ElevenLabs
+ * @param {string} text - Text to convert to speech
+ * @param {string} language - Language code ('hi', 'en', 'hinglish')
+ * @param {string} voiceType - Voice type ('male' or 'female')
+ * @returns {Promise<Object>} - { success, audio, format, source }
+ */
+export const synthesizeSpeech = async (text, language = 'hi', voiceType = 'female') => {
+    try {
+        const response = await api.post('/tts/synthesize', {
+            text,
+            language,
+            voiceType
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error synthesizing speech:', error);
+        return {
+            success: false,
+            error: error.message
+        };
+    }
+};
+
 export const analyzeYield = async (data) => {
     const response = await api.post('/ai/analyze', { type: 'yield', data });
     return response.data.analysis;

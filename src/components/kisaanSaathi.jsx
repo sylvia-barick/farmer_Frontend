@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Mic, MessageSquare, Loader2, Minimize2, Paperclip, Languages } from "lucide-react";
-import { chatWithMastra } from '../services/backendApi';
+import { Send, Mic, MessageSquare, Loader2, Minimize2, Paperclip, Languages, Volume2 } from "lucide-react";
+import { chatWithMastra, transcribeAudio, synthesizeSpeech } from '../services/backendApi';
 import { auth } from '../utils/firebaseConfig';
 
 const KisaanSaathi = ({ user }) => {
@@ -9,15 +9,30 @@ const KisaanSaathi = ({ user }) => {
   const [inputValue, setInputValue] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [attachedFile, setAttachedFile] = useState(null);
   const [threadId, setThreadId] = useState(null); // For Mastra conversation continuity
-  const [preferredLang, setPreferredLang] = useState('hi'); // Default Hindi
+  const [preferredLang, setPreferredLang] = useState('hinglish'); // Default Hinglish (mix of Hindi/English)
+  const [useTTS, setUseTTS] = useState(true); // Enable ElevenLabs TTS by default
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
+  const audioRef = useRef(null);
+
+  // Language names for display
+  const langLabels = {
+    hi: 'हिंदी',
+    en: 'English',
+    hinglish: 'Hinglish'
+  };
 
   const toggleLang = () => {
-    setPreferredLang(prev => prev === 'hi' ? 'en' : 'hi');
+    // Cycle through: hinglish -> hi -> en -> hinglish
+    setPreferredLang(prev => {
+      if (prev === 'hinglish') return 'hi';
+      if (prev === 'hi') return 'en';
+      return 'hinglish';
+    });
   };
 
   const toggleChat = () => {
@@ -32,34 +47,102 @@ const KisaanSaathi = ({ user }) => {
     scrollToBottom();
   }, [chats, isOpen]);
 
-  const speakText = (text, ttsUrl, lang = preferredLang === 'hi' ? 'hi-IN' : 'en-US') => {
-    if (ttsUrl) {
-      const audio = new Audio(ttsUrl);
-      audio.play().catch(e => console.warn("TTS Playback failed:", e));
+  /**
+   * Speak text using ElevenLabs TTS or fallback to browser TTS
+   */
+  const speakText = async (text, ttsData = null) => {
+    if (!text) return;
+    
+    // Clean text for TTS
+    const cleanText = text
+      .replace(/\*\*(.*?)\*\*/g, '$1') // Remove markdown bold
+      .replace(/[📋💰🌾🛡️🌤️✅❌🔄🙏👋🏦🚑]/g, '') // Remove emojis
+      .substring(0, 500); // Limit length for TTS
+    
+    // If we have audio data from ElevenLabs, use it
+    if (ttsData?.audio) {
+      try {
+        setIsSpeaking(true);
+        const audio = new Audio(ttsData.audio);
+        audioRef.current = audio;
+        audio.onended = () => setIsSpeaking(false);
+        audio.onerror = () => {
+          setIsSpeaking(false);
+          fallbackToWebSpeechTTS(cleanText);
+        };
+        await audio.play();
+        return;
+      } catch (e) {
+        console.warn("ElevenLabs playback failed, using fallback:", e);
+      }
+    }
+    
+    // Try ElevenLabs API
+    if (useTTS) {
+      try {
+        setIsSpeaking(true);
+        const result = await synthesizeSpeech(cleanText, preferredLang, 'female');
+        
+        if (result.success && result.audio) {
+          const audio = new Audio(result.audio);
+          audioRef.current = audio;
+          audio.onended = () => setIsSpeaking(false);
+          audio.onerror = () => {
+            setIsSpeaking(false);
+            fallbackToWebSpeechTTS(cleanText);
+          };
+          await audio.play();
+          return;
+        }
+      } catch (e) {
+        console.warn("ElevenLabs TTS failed:", e);
+      }
+    }
+    
+    // Fallback to browser TTS
+    fallbackToWebSpeechTTS(cleanText);
+  };
+  
+  /**
+   * Fallback to browser's Web Speech API for TTS
+   */
+  const fallbackToWebSpeechTTS = (text) => {
+    if (!text || typeof window === 'undefined' || !window.speechSynthesis) {
+      setIsSpeaking(false);
       return;
     }
-
-    if (!text || typeof window === 'undefined' || !window.speechSynthesis) return;
-    text = text.replace(/\*\*(.*?)\*\*/g, '$1');
-    const speakNow = () => {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = lang;
-      const voices = window.speechSynthesis.getVoices();
-      const selectedVoice = voices.find(voice => voice.lang === lang);
-      if (selectedVoice) utterance.voice = selectedVoice;
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utterance);
-    };
-    if (window.speechSynthesis.getVoices().length === 0) {
-      window.speechSynthesis.onvoiceschanged = speakNow;
-    } else {
-      speakNow();
+    
+    setIsSpeaking(true);
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = (preferredLang === 'hi' || preferredLang === 'hinglish') ? 'hi-IN' : 'en-US';
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    
+    const voices = window.speechSynthesis.getVoices();
+    const selectedVoice = voices.find(voice => voice.lang === utterance.lang);
+    if (selectedVoice) utterance.voice = selectedVoice;
+    
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+  };
+  
+  /**
+   * Stop current speech
+   */
+  const stopSpeaking = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
     }
+    window.speechSynthesis?.cancel();
+    setIsSpeaking(false);
   };
 
-  const addMessage = (query, type, originalQuery = '', attachment = null, ttsUrl = null) => {
-    setChats(prev => [...prev, { query, type, originalQuery, attachment, ttsUrl }]);
-    if (type === 'response') speakText(query, ttsUrl);
+  const addMessage = (query, type, originalQuery = '', attachment = null, ttsData = null) => {
+    setChats(prev => [...prev, { query, type, originalQuery, attachment, ttsData }]);
+    if (type === 'response' && useTTS) {
+      speakText(query, ttsData);
+    }
   };
 
   const handleSendMessage = async () => {
@@ -115,16 +198,75 @@ const KisaanSaathi = ({ user }) => {
   // - Plant disease detection workflow
   // - General farming advice and queries
 
-  const startListening = () => {
+  const startListening = async () => {
+    try {
+      // Use Whisper API for better accuracy (especially for Hindi)
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      const audioChunks = [];
+      
+      setIsListening(true);
+      
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunks.push(event.data);
+      };
+      
+      mediaRecorder.onstop = async () => {
+        stream.getTracks().forEach(track => track.stop());
+        
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        
+        // Convert to base64 and send to Whisper API
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        reader.onloadend = async () => {
+          try {
+            const base64Audio = reader.result;
+            // For Hinglish, use Hindi language hint as Whisper handles mixed language well
+            const whisperLang = (preferredLang === 'hi' || preferredLang === 'hinglish') ? 'hi' : 'en';
+            const data = await transcribeAudio(base64Audio, 'audio/webm', whisperLang);
+            
+            if (data.success && data.text) {
+              setInputValue(data.text);
+            } else {
+              console.warn('Whisper transcription failed, falling back to browser API');
+              fallbackToWebSpeech();
+            }
+          } catch (error) {
+            console.error('Whisper API error:', error);
+            fallbackToWebSpeech();
+          }
+          setIsListening(false);
+        };
+      };
+      
+      // Record for 5 seconds max
+      mediaRecorder.start();
+      setTimeout(() => {
+        if (mediaRecorder.state === 'recording') {
+          mediaRecorder.stop();
+        }
+      }, 5000);
+      
+    } catch (error) {
+      console.error('Microphone access error:', error);
+      fallbackToWebSpeech();
+    }
+  };
+  
+  // Fallback to browser's Web Speech API
+  const fallbackToWebSpeech = () => {
     if ('webkitSpeechRecognition' in window) {
       const r = new window.webkitSpeechRecognition();
-      r.lang = preferredLang === 'hi' ? 'hi-IN' : 'en-US';
+      // For Hinglish, use Hindi as it handles mixed language better
+      r.lang = (preferredLang === 'hi' || preferredLang === 'hinglish') ? 'hi-IN' : 'en-US';
       r.onstart = () => setIsListening(true);
       r.onresult = (e) => { setInputValue(e.results[0][0].transcript); setIsListening(false); };
       r.onend = () => setIsListening(false);
       r.start();
     } else {
       alert('Speech recognition not supported in your browser');
+      setIsListening(false);
     }
   };
 
@@ -144,33 +286,62 @@ const KisaanSaathi = ({ user }) => {
           <div className="bg-gradient-to-r from-green-400 to-blue-500 border-b-4 border-black p-4 flex justify-between items-center">
             <div className="flex flex-col">
               <h3 className="font-black text-2xl uppercase text-white drop-shadow-lg">🌾 Kisaan Saathi</h3>
-              <span
-                className="text-[10px] font-black uppercase text-white/90 flex items-center gap-1 cursor-pointer hover:text-yellow-300 transition-colors"
-                onClick={toggleLang}
-              >
-                <Languages className="h-3 w-3" />
-                {preferredLang === 'hi' ? 'Hindi (हिन्दी)' : 'English'} - Click to Toggle
-              </span>
+              <div className="flex items-center gap-2">
+                <span
+                  className="text-[10px] font-black uppercase text-white/90 flex items-center gap-1 cursor-pointer hover:text-yellow-300 transition-colors"
+                  onClick={toggleLang}
+                >
+                  <Languages className="h-3 w-3" />
+                  {langLabels[preferredLang]}
+                </span>
+                <span 
+                  className={`text-[10px] font-black uppercase flex items-center gap-1 cursor-pointer transition-colors ${useTTS ? 'text-yellow-300' : 'text-white/50'}`}
+                  onClick={() => { setUseTTS(!useTTS); if (isSpeaking) stopSpeaking(); }}
+                  title={useTTS ? 'TTS On - Click to disable' : 'TTS Off - Click to enable'}
+                >
+                  <Volume2 className="h-3 w-3" />
+                  {useTTS ? 'ON' : 'OFF'}
+                </span>
+              </div>
             </div>
-            <button
-              onClick={toggleChat}
-              className="bg-red-600 text-white p-2 rounded border-2 border-black hover:bg-red-700 transition-colors"
-            >
-              <Minimize2 className="h-5 w-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              {isSpeaking && (
+                <button
+                  onClick={stopSpeaking}
+                  className="bg-yellow-500 text-white p-2 rounded border-2 border-black hover:bg-yellow-600 transition-colors animate-pulse"
+                  title="Stop speaking"
+                >
+                  <Volume2 className="h-5 w-5" />
+                </button>
+              )}
+              <button
+                onClick={toggleChat}
+                className="bg-red-600 text-white p-2 rounded border-2 border-black hover:bg-red-700 transition-colors"
+              >
+                <Minimize2 className="h-5 w-5" />
+              </button>
+            </div>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gradient-to-b from-stone-50 to-stone-100">
             {chats.length === 0 && (
               <div className="text-center py-8 text-gray-500">
-                <p className="font-bold mb-2">👋 Welcome to Kisaan Saathi!</p>
-                <p className="text-sm">I can help you with:</p>
+                <p className="font-bold mb-2">
+                  {preferredLang === 'hi' ? '👋 किसान साथी में आपका स्वागत है!' : 
+                   preferredLang === 'en' ? '👋 Welcome to Kisaan Saathi!' : 
+                   '👋 Kisaan Saathi mein aapka swagat hai!'}
+                </p>
+                <p className="text-sm">
+                  {preferredLang === 'hi' ? 'मैं आपकी इन चीजों में मदद कर सकता हूं:' : 
+                   preferredLang === 'en' ? 'I can help you with:' : 
+                   'Main aapki in cheezon mein madad kar sakta hoon:'}
+                </p>
                 <ul className="text-xs mt-2 space-y-1">
-                  <li>🏦 Loan Applications</li>
-                  <li>🛡️ Insurance Claims</li>
-                  <li>🌾 Yield Predictions</li>
-                  <li>🚑 Plant Disease Diagnosis</li>
-                  <li>❓ General farming queries</li>
+                  <li>🏦 {preferredLang === 'hi' ? 'लोन आवेदन' : preferredLang === 'en' ? 'Loan Applications' : 'Loan Applications'}</li>
+                  <li>🛡️ {preferredLang === 'hi' ? 'बीमा दावे' : preferredLang === 'en' ? 'Insurance Claims' : 'Insurance Claims'}</li>
+                  <li>🌤️ {preferredLang === 'hi' ? 'मौसम की जानकारी' : preferredLang === 'en' ? 'Weather Information' : 'Mausam ki Jaankari'}</li>
+                  <li>🚑 {preferredLang === 'hi' ? 'फसल रोग निदान' : preferredLang === 'en' ? 'Plant Disease Diagnosis' : 'Fasal Rog Diagnosis'}</li>
+                  <li>📋 {preferredLang === 'hi' ? 'सरकारी योजनाएं' : preferredLang === 'en' ? 'Government Schemes' : 'Sarkari Yojanaein'}</li>
                 </ul>
               </div>
             )}
