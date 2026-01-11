@@ -68,16 +68,16 @@ const AuthDialog = ({ isOpen, onClose, onLogin, onRegister }) => {
   };
 
   const handleSubmit = async (uid) => {
-    // Mock registration
+    // Registration payload using actual user data
     const payload = {
       uid: uid,
-      name: formData.name || "Debangshu Chatterjee",
-      email: formData.email || "debangshuchatterjee2005@gmail.com",
-      totalLand: formData.totalLand || 3,
-      locationLat: formData.locationLat || '22.572645',
-      locationLong: formData.locationLong || '88.363892',
-      crops: formData.crops.split(',').map(crop => crop.trim()) || ['Rice', 'Wheat', 'Paddy'],
-      phone: formData.phone || 8910169299,
+      name: formData.name,
+      email: formData.email,
+      totalLand: formData.landSize, // Mapping landSize input to totalLand db field
+      locationLat: formData.locationLat,
+      locationLong: formData.locationLong,
+      crops: formData.crops.split(',').map(crop => crop.trim()).filter(crop => crop.length > 0),
+      phone: formData.phone,
       aadhar: formData.aadhar
     }
 
@@ -402,8 +402,20 @@ const AuthDialog = ({ isOpen, onClose, onLogin, onRegister }) => {
                 onClick={(e) => {
                   e.preventDefault();
                   if (isLogin) {
+                    if (!loginFormData.email || !loginFormData.password) {
+                      alert("Please enter both email and password.");
+                      return;
+                    }
                     onLogin(loginFormData.email, loginFormData.password);
                   } else {
+                    if (!formData.email || !formData.password) {
+                      alert("Please enter an email and password.");
+                      return;
+                    }
+                    if (!formData.name) {
+                      alert("Please enter your full name.");
+                      return;
+                    }
                     handleSignup(formData.email, formData.password);
                   }
                 }}

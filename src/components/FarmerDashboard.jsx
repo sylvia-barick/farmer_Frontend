@@ -29,7 +29,7 @@ import LoanStatus from "./LoanStatus";
 import InsuranceStatus from "./InsuranceStatus";
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth, db } from '../utils/firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import PastReports from "./pastRecords";
 import KisaanSaathi from "./kisaanSaathi";
@@ -94,9 +94,9 @@ const FarmerDashboard = ({ user, onLogout }) => {
         console.log("Fetching news from Serper API...");
         const response = await getAgriculturalNews();
 
-        if (response.success && response.data) {
+        if (response.success && response.articles) {
           // Transform Serper data to match our UI format
-          const transformedNews = response.data.map(article => ({
+          const transformedNews = response.articles.map(article => ({
             title: article.title,
             snippet: article.snippet,
             time: getRelativeTime(article.date),
@@ -290,16 +290,36 @@ const FarmerDashboard = ({ user, onLogout }) => {
     setEditFormData({ ...editFormData, [e.target.name]: e.target.value });
   };
 
-  const saveProfile = () => {
-    // Optimistic update
-    const updatedUser = {
-      ...displayData.user,
-      ...editFormData,
-      crops: editFormData.crops.split(',').map(c => c.trim()).filter(c => c)
-    };
-    setDisplayData({ ...displayData, user: updatedUser });
-    setIsEditingProfile(false);
-    // TODO: Call backend to persist changes
+  const saveProfile = async () => {
+    try {
+      const cropsArray = editFormData.crops.split(',').map(c => c.trim()).filter(c => c);
+
+      // Firestore Update
+      if (displayData.user.uid) {
+        const userRef = doc(db, "users", displayData.user.uid);
+        await updateDoc(userRef, {
+          name: editFormData.name,
+          totalLand: editFormData.totalLand,
+          crops: cropsArray,
+          locationLat: editFormData.locationLat,
+          locationLong: editFormData.locationLong
+        });
+        console.log("Profile updated in Firestore");
+      }
+
+      // Optimistic update (UI)
+      const updatedUser = {
+        ...displayData.user,
+        ...editFormData,
+        crops: cropsArray
+      };
+      setDisplayData({ ...displayData, user: updatedUser });
+      setIsEditingProfile(false);
+      alert("Profile updated successfully!");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("Failed to update profile. Please try again.");
+    }
   };
 
 

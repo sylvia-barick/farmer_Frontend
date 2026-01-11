@@ -99,31 +99,39 @@ const InsuranceStatus = ({ user, onBack }) => {
                                             </span>
                                         </div>
                                         <h3 className="text-xl font-bold text-agricultural-soil-brown mb-1">
-                                            {claim.claimType || claim.damageType || 'Insurance Claim'}
+                                            {claim.provider || 'Insurance Claim'}
                                         </h3>
                                         <div className="flex gap-4 text-sm text-agricultural-stone-gray">
-                                            <span>{claim.cropType || 'Crop'}</span>
+                                            <span>Policy: {claim.policyNumber || 'N/A'}</span>
                                             <span>•</span>
-                                            <span>{claim.acres || claim.affectedArea || 0} Acres Affected</span>
+                                            <span>UIN: {claim.uin || 'N/A'}</span>
                                         </div>
 
-                                        {claim.aiAnalysis && (
+                                        {claim.aiReasoning && (
                                             <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
                                                 <div className="flex items-center gap-2 mb-2">
                                                     <FileText className="h-4 w-4 text-blue-600" />
                                                     <span className="text-xs font-bold text-blue-800 uppercase">AI Analysis</span>
                                                 </div>
-                                                <p className="text-sm text-blue-900">{claim.aiAnalysis.slice(0, 200)}...</p>
+                                                <p className="text-sm text-blue-900">{claim.aiReasoning}</p>
+                                                {claim.damagePrediction && (
+                                                    <p className="text-sm text-blue-700 mt-2">Damage: {claim.damagePrediction}</p>
+                                                )}
                                             </div>
                                         )}
                                     </div>
                                     <div className="text-right flex-shrink-0">
                                         <div className="text-3xl font-black text-agricultural-forest-green">
-                                            ₹{(claim.claimAmount || claim.estimatedLoss || 0).toLocaleString('en-IN')}
+                                            ₹{Number(claim.claimAmount || 0).toLocaleString('en-IN')}
                                         </div>
                                         <div className="text-sm font-medium text-agricultural-stone-gray">
                                             Claimed Amount
                                         </div>
+                                        {claim.authenticityScore && (
+                                            <div className="text-xs text-gray-500 mt-2">
+                                                Authenticity: {claim.authenticityScore}%
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

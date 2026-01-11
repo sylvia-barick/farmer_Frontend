@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Mic, MessageSquare, Loader2, Minimize2, Paperclip, Languages } from "lucide-react";
-import { askAI, sendFeedback, identifyDisease, applyLoan, submitInsuranceClaim, submitYieldPrediction } from '../services/backendApi';
+import { chatWithMastra } from '../services/backendApi';
 import { auth } from '../utils/firebaseConfig';
 
 const KisaanSaathi = ({ user }) => {
@@ -10,11 +10,7 @@ const KisaanSaathi = ({ user }) => {
   const [isListening, setIsListening] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [attachedFile, setAttachedFile] = useState(null);
-
-  // Flow State Management
-  const [flowState, setFlowState] = useState('IDLE'); // IDLE, LOAN, INSURANCE, YIELD, PLANT_DOCTOR
-  const [step, setStep] = useState(0);
-  const [flowData, setFlowData] = useState({});
+  const [threadId, setThreadId] = useState(null); // For Mastra conversation continuity
   const [preferredLang, setPreferredLang] = useState('hi'); // Default Hindi
 
   const messagesEndRef = useRef(null);
@@ -78,28 +74,30 @@ const KisaanSaathi = ({ user }) => {
     setIsLoading(true);
 
     try {
-      let responseData = { analysis: "", ttsUrl: null };
-
-      if (flowState !== 'IDLE') {
-        const result = await handleFlowInput(currentInput, currentFile);
-        // If result is null, a topic switch occurred (startFlow was called)
-        if (result === null) {
-          setIsLoading(false);
-          return;
+      // Always use Mastra agent - it handles all workflows and conversations intelligently
+      const userId = auth.currentUser?.uid || user?.uid || 'anonymous';
+      
+      // If there's an attached file, include it in the message
+      let messageContent = currentInput;
+      if (currentFile) {
+        // TODO: Convert image to base64 and send with message for plant disease detection
+        messageContent += `\n[User attached file: ${currentFile.name}]`;
+      }
+      
+      const mastraResponse = await chatWithMastra(messageContent, userId, threadId, preferredLang);
+      
+      let responseText = '';
+      if (mastraResponse.success) {
+        responseText = mastraResponse.response;
+        // Update threadId for conversation continuity
+        if (mastraResponse.threadId) {
+          setThreadId(mastraResponse.threadId);
         }
-        responseData.analysis = result;
       } else {
-        const intent = detectIntent(currentInput);
-        if (intent) {
-          startFlow(intent);
-          setIsLoading(false);
-          return;
-        } else {
-          responseData = await askAI(currentInput, preferredLang);
-        }
+        responseText = mastraResponse.response || "I apologize, but I'm unable to process your request right now.";
       }
 
-      addMessage(responseData.analysis, 'response', currentInput, null, responseData.ttsUrl);
+      addMessage(responseText, 'response', currentInput, null, null);
 
     } catch (error) {
       console.error('Chatbot error:', error);
@@ -109,255 +107,13 @@ const KisaanSaathi = ({ user }) => {
     }
   };
 
-  const detectIntent = (text) => {
-    const lower = text.toLowerCase();
-    if (lower.includes('loan') || lower.includes('money') || lower.includes('credit')) return 'LOAN';
-    if (lower.includes('insurance') || lower.includes('claim') || lower.includes('policy')) return 'INSURANCE';
-    if (lower.includes('yield') || lower.includes('harvest') || lower.includes('production')) return 'YIELD';
-    if (lower.includes('plant') || lower.includes('disease') || lower.includes('doctor') || lower.includes('crop health')) return 'PLANT_DOCTOR';
-    return null;
-  };
-
-  const startFlow = (flowName) => {
-    setFlowState(flowName);
-    setStep(1);
-    setFlowData({});
-
-    let prompt = "";
-    switch (flowName) {
-      case 'LOAN':
-        prompt = "🏦 I can help you apply for a loan!\n\nFirst, what is the **purpose** of the loan?\n(e.g., Crop Cultivation, Equipment Purchase, Seeds)";
-        break;
-      case 'INSURANCE':
-        prompt = "🛡️ Let's file an insurance claim.\n\nWhich **Insurance Provider** is your policy with?\n(e.g., AIC, IFFCO Tokio, Bajaj Allianz)";
-        break;
-      case 'YIELD':
-        prompt = "🌾 Let's predict your crop yield!\n\nWhat **type of crop** are you growing?\n(e.g., Rice, Wheat, Cotton)";
-        break;
-      case 'PLANT_DOCTOR':
-        prompt = "🚑 I can diagnose plant diseases.\n\nPlease **upload a photo** of the affected plant using the attachment button (📎).";
-        break;
-      default:
-        prompt = "How can I help you today?";
-    }
-
-    setTimeout(() => addMessage(prompt, 'response'), 500);
-  };
-
-  const handleFlowInput = async (input, file) => {
-    const currentStep = step;
-    const lowerInput = input.toLowerCase();
-
-    // Handle cancellation
-    if (lowerInput.includes('cancel') || lowerInput.includes('stop') || lowerInput.includes('exit')) {
-      setFlowState('IDLE');
-      setFlowData({});
-      setStep(0);
-      return "❌ Process cancelled. How else can I help you?";
-    }
-
-    // 🔄 TOPIC SWITCH DETECTION: Check if user wants to switch to a different topic mid-flow
-    const newIntent = detectIntent(input);
-    if (newIntent && newIntent !== flowState) {
-      // User is asking about a different topic - switch immediately
-      setFlowState('IDLE');
-      setFlowData({});
-      setStep(0);
-      startFlow(newIntent);
-      return null; // startFlow will add the message
-    }
-
-    // LOAN FLOW
-    if (flowState === 'LOAN') {
-      if (currentStep === 1) {
-        setFlowData({ ...flowData, purpose: input });
-        setStep(2);
-        return "What **Crop** is this loan for?";
-      }
-      if (currentStep === 2) {
-        setFlowData({ ...flowData, crop: input });
-        setStep(3);
-        return "How much **amount** (in ₹) do you need?";
-      }
-      if (currentStep === 3) {
-        const amount = parseFloat(input.replace(/[^\d.]/g, ''));
-        if (isNaN(amount) || amount <= 0) {
-          return "⚠️ Please enter a valid amount in numbers (e.g., 50000)";
-        }
-        setFlowData({ ...flowData, amount: amount });
-        setStep(4);
-        return "For how many **years** repayment period? (1-10 years)";
-      }
-      if (currentStep === 4) {
-        const years = parseInt(input);
-        if (isNaN(years) || years < 1 || years > 10) {
-          return "⚠️ Please enter a valid number of years between 1 and 10";
-        }
-
-        try {
-          const loanData = {
-            farmerUid: auth.currentUser?.uid || user?.uid,
-            loanPurpose: flowData.purpose,
-            requestedAmount: flowData.amount,
-            tenureMonths: years * 12,
-            cropType: flowData.crop,
-            landSize: user?.totalLand || user?.landSize || 5
-          };
-
-          await applyLoan(loanData);
-          setFlowState('IDLE');
-          setFlowData({});
-          setStep(0);
-          return `✅ **Loan Application Submitted Successfully!**\n\n📋 Details:\n💰 Amount: ₹${flowData.amount.toLocaleString('en-IN')}\n🎯 Purpose: ${flowData.purpose}\n🌾 Crop: ${flowData.crop}\n⏱️ Duration: ${years} years\n\nYour application is under review. You'll be notified soon!`;
-        } catch (e) {
-          console.error('Loan submission error:', e);
-          setFlowState('IDLE');
-          setFlowData({});
-          setStep(0);
-          return `❌ **Submission Failed**\n\n${e.message}\nPlease try again or contact support.`;
-        }
-      }
-    }
-
-    // YIELD PREDICTION FLOW
-    if (flowState === 'YIELD') {
-      if (currentStep === 1) {
-        setFlowData({ ...flowData, crop: input });
-        setStep(2);
-        return "How many **acres** of land?";
-      }
-      if (currentStep === 2) {
-        const acres = parseFloat(input.replace(/[^\d.]/g, ''));
-        if (isNaN(acres) || acres <= 0) {
-          return "⚠️ Please enter a valid number of acres (e.g., 5 or 2.5)";
-        }
-        setFlowData({ ...flowData, acres: acres });
-        setStep(3);
-        return "What is the **soil type**?\n(Clay / Sandy / Loamy / Black)";
-      }
-      if (currentStep === 3) {
-        setFlowData({ ...flowData, soilType: input });
-        setStep(4);
-        return "What **season** are you planting in?\n(Kharif / Rabi / Zaid)";
-      }
-      if (currentStep === 4) {
-        try {
-          const yieldData = {
-            crop: flowData.crop,
-            area: flowData.acres,
-            soilType: flowData.soilType,
-            season: input,
-            rainfall: 800,
-            temperature: 25,
-            humidity: 65
-          };
-
-          const prediction = await submitYieldPrediction(yieldData);
-          setFlowState('IDLE');
-          setFlowData({});
-          setStep(0);
-          return `🌾 **Yield Prediction Results**\n\n${prediction}\n\n📊 Input Data:\n🌱 Crop: ${flowData.crop}\n📏 Area: ${flowData.acres} acres\n🌍 Soil: ${flowData.soilType}\n🌦️ Season: ${input}`;
-        } catch (e) {
-          console.error('Yield prediction error:', e);
-          setFlowState('IDLE');
-          setFlowData({});
-          setStep(0);
-          return `⚠️ **Prediction Failed**\n\n${e.message}\nPlease try again with valid data.`;
-        }
-      }
-    }
-
-    // PLANT DOCTOR FLOW
-    if (flowState === 'PLANT_DOCTOR') {
-      if (currentStep === 1) {
-        if (file) {
-          try {
-            const diagnosis = await identifyDisease(file, input || "Analyze this plant image and identify any diseases or problems.");
-            setFlowState('IDLE');
-            setFlowData({});
-            setStep(0);
-            return `🚑 **Plant Diagnosis Report**\n\n${diagnosis}\n\n💡 **Tip**: Follow the recommendations carefully for best results!`;
-          } catch (e) {
-            console.error('Disease diagnosis error:', e);
-            setFlowState('IDLE');
-            setFlowData({});
-            setStep(0);
-            return `❌ **Diagnosis Failed**\n\n${e.message}\nPlease upload a clear image of the affected plant.`;
-          }
-        } else {
-          return "📷 Please **upload an image** of the affected plant using the attachment button (📎).";
-        }
-      }
-    }
-
-    // INSURANCE CLAIM FLOW
-    if (flowState === 'INSURANCE') {
-      if (currentStep === 1) {
-        setFlowData({ ...flowData, provider: input });
-        setStep(2);
-        return "What is your **UIN** (Unique Identification Number)?";
-      }
-      if (currentStep === 2) {
-        setFlowData({ ...flowData, uin: input });
-        setStep(3);
-        return "What is your **Policy Number**?";
-      }
-      if (currentStep === 3) {
-        setFlowData({ ...flowData, policyNumber: input });
-        setStep(4);
-        return "Please **upload damage photo** using the attachment button (📎)\n\nOr type 'skip' to submit without photo.";
-      }
-      if (currentStep === 4) {
-        if (lowerInput === 'skip' && !file) {
-          // Submit without file
-          try {
-            const fd = new FormData();
-            fd.append('uid', auth.currentUser?.uid || user?.uid);
-            fd.append('provider', flowData.provider);
-            fd.append('uin', flowData.uin);
-            fd.append('policyNumber', flowData.policyNumber);
-
-            await submitInsuranceClaim(fd);
-            setFlowState('IDLE');
-            setFlowData({});
-            setStep(0);
-            return `✅ **Insurance Claim Submitted!**\n\n📋 Details:\n🏢 Provider: ${flowData.provider}\n🆔 UIN: ${flowData.uin}\n📝 Policy: ${flowData.policyNumber}\n\nYour claim is under review.`;
-          } catch (e) {
-            console.error('Insurance claim error:', e);
-            setFlowState('IDLE');
-            setFlowData({});
-            setStep(0);
-            return `❌ **Claim Failed**\n\n${e.message}`;
-          }
-        } else if (file) {
-          try {
-            const fd = new FormData();
-            fd.append('uid', auth.currentUser?.uid || user?.uid);
-            fd.append('provider', flowData.provider);
-            fd.append('uin', flowData.uin);
-            fd.append('policyNumber', flowData.policyNumber);
-            fd.append('damagePhoto', file);
-
-            await submitInsuranceClaim(fd);
-            setFlowState('IDLE');
-            setFlowData({});
-            setStep(0);
-            return `✅ **Insurance Claim Submitted Successfully!**\n\n📋 Details:\n🏢 Provider: ${flowData.provider}\n🆔 UIN: ${flowData.uin}\n📝 Policy: ${flowData.policyNumber}\n📸 Damage Photo: Attached\n\nYour claim is under review. Track status in the Insurance Claims section.`;
-          } catch (e) {
-            console.error('Insurance claim error:', e);
-            setFlowState('IDLE');
-            setFlowData({});
-            setStep(0);
-            return `❌ **Claim Submission Failed**\n\n${e.message}\nPlease try again or submit through the Insurance Claim form.`;
-          }
-        } else {
-          return "Please upload a damage photo or type 'skip' to continue without it.";
-        }
-      }
-    }
-
-    return "I didn't understand that. Can you try again?";
-  };
+  // All conversation flows and workflows are now handled by the Mastra agent
+  // The agent intelligently detects intent and executes appropriate workflows:
+  // - Loan application workflow
+  // - Insurance claim workflow
+  // - Yield prediction workflow
+  // - Plant disease detection workflow
+  // - General farming advice and queries
 
   const startListening = () => {
     if ('webkitSpeechRecognition' in window) {

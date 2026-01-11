@@ -56,6 +56,55 @@ export const askAI = async (prompt, lang = 'hi') => {
     }
 };
 
+/**
+ * Chat with Mastra Farmer Assistant Agent
+ * @param {string} message - User's message
+ * @param {string} userId - Firebase UID of the user
+ * @param {string} threadId - Optional conversation thread ID
+ * @param {string} lang - Preferred language (default: 'hi')
+ * @returns {Promise<Object>} - { success, response, threadId, timestamp }
+ */
+export const chatWithMastra = async (message, userId, threadId = null, lang = 'hi') => {
+    try {
+        const response = await api.post('/mastra/chat', {
+            message,
+            userId,
+            threadId,
+            lang
+        });
+        return response.data; // Returns { success, response, threadId, timestamp }
+    } catch (error) {
+        console.error('Error chatting with Mastra:', error);
+        return {
+            success: false,
+            response: "I apologize, but I'm unable to process your request right now. Please try again later.",
+            threadId: threadId || null,
+            timestamp: new Date().toISOString()
+        };
+    }
+};
+
+/**
+ * Execute a Mastra workflow
+ * @param {string} workflowName - Name of the workflow to execute
+ * @param {Object} input - Input data for the workflow
+ * @param {string} userId - Firebase UID of the user
+ * @returns {Promise<Object>} - { success, result, workflowName, timestamp }
+ */
+export const executeMastraWorkflow = async (workflowName, input, userId) => {
+    try {
+        const response = await api.post('/mastra/workflow', {
+            workflowName,
+            input,
+            userId
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error executing Mastra workflow:', error);
+        throw error;
+    }
+};
+
 export const analyzeYield = async (data) => {
     const response = await api.post('/ai/analyze', { type: 'yield', data });
     return response.data.analysis;
@@ -187,6 +236,7 @@ export const submitYieldPrediction = async (predictionData) => {
 export const getAgriculturalNews = async () => {
     try {
         const response = await api.get('/news');
+        console.log("Fetching agricultural news from backend...", response.data);
         return response.data;
     } catch (error) {
         console.error('Error fetching agricultural news:', error);
