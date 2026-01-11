@@ -3,32 +3,32 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
-import { Upload, Cpu, FileText, CheckCircle } from 'lucide-react';
+import { Mic, Bot, FileCheck, Banknote } from 'lucide-react';
 
 const WorkflowSection = () => {
     const steps = [
         {
-            title: "Data Input",
-            description: "Farmers upload soil data, crop images, or location details via our intuitive mobile interface.",
-            icon: Upload,
+            title: "Speak or Type",
+            description: "Just say 'Mujhe loan chahiye' or type in Hindi, English, or Hinglish - our AI understands naturally.",
+            icon: Mic,
             color: "bg-blue-500"
         },
         {
-            title: "AI Analysis",
-            description: "Our multi-model AI engine analyzes the inputs against global agricultural datasets and weather patterns.",
-            icon: Cpu,
+            title: "AI Conversation",
+            description: "KisaanSathi asks simple questions one-by-one: crop type, amount needed, repayment period - like talking to a friend.",
+            icon: Bot,
             color: "bg-purple-500"
         },
         {
-            title: "Report Generation",
-            description: "Instant generation of comprehensive yield prediction and health status reports.",
-            icon: FileText,
+            title: "Instant Application",
+            description: "Your loan or insurance application is automatically created and submitted. No forms, no paperwork, no bank visits.",
+            icon: FileCheck,
             color: "bg-orange-500"
         },
         {
-            title: "Actionable Insights",
-            description: "Receive personalized recommendations for fertilizers, irrigation, and financial planning.",
-            icon: CheckCircle,
+            title: "Quick Approval",
+            description: "Get AI-powered eligibility check and fraud scoring. Track your application status anytime through the app.",
+            icon: Banknote,
             color: "bg-green-500"
         }
     ];
@@ -37,9 +37,9 @@ const WorkflowSection = () => {
         <section className="py-24 bg-[#F8FAFC]">
             <div className="container mx-auto px-6 md:px-12 lg:px-20">
                 <div className="mb-16 text-center">
-                    <h2 className="text-sm font-bold tracking-wider text-green-600 uppercase mb-4">System Workflow</h2>
+                    <h2 className="text-sm font-bold tracking-wider text-green-600 uppercase mb-4">How It Works</h2>
                     <h3 className="text-3xl md:text-5xl font-bold text-gray-900">
-                        From Soil to Success
+                        From Voice to Approval in Minutes
                     </h3>
                 </div>
 

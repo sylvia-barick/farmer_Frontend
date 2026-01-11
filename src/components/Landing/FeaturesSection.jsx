@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Scan, CloudRain, Landmark, Bot, ArrowUpRight } from 'lucide-react';
+import { Mic, CloudRain, Landmark, Bot, ArrowUpRight, Shield } from 'lucide-react';
 
 const FeatureCard = ({ title, description, icon: Icon, color, delay }) => {
     return (
@@ -31,29 +31,29 @@ const FeatureCard = ({ title, description, icon: Icon, color, delay }) => {
 const FeaturesSection = () => {
     const features = [
         {
-            title: "AI Disease Detection",
-            description: "Instantly identify crop diseases using advanced computer vision. Simply upload a photo to get a diagnosis and treatment plan.",
-            icon: Scan,
+            title: "Voice-First AI",
+            description: "Just speak! Our Whisper-powered speech recognition understands Hindi, English, and Hinglish. Apply for loans or claim insurance by talking naturally.",
+            icon: Mic,
             color: "bg-red-50 hover:bg-red-100/80",
             delay: 0.2
         },
         {
-            title: "Yield & Weather",
-            description: "Precise yield forecasts and localized weather prediction models to optimize harvest planning and resource allocation.",
+            title: "Smart Weather Alerts",
+            description: "Get location-based weather forecasts with crop-specific advisories. Know when to sow, spray, and harvest for maximum yield.",
             icon: CloudRain,
             color: "bg-blue-50 hover:bg-blue-100/80",
             delay: 0.3
         },
         {
-            title: "Smart Finance",
-            description: "Seamless access to agricultural loans and insurance. Our smart contracts ensure quick disbursement based on verified data.",
+            title: "Instant Loan & Insurance",
+            description: "Apply for agricultural loans in 5 minutes through conversation. File insurance claims with step-by-step voice guidance - no paperwork needed.",
             icon: Landmark,
             color: "bg-orange-50 hover:bg-orange-100/80",
             delay: 0.4
         },
         {
-            title: "Kisaan Saathi",
-            description: "24/7 AI-powered agricultural assistant. Get instant answers to your farming queries in multiple languages.",
+            title: "Kisaan Saathi Assistant",
+            description: "Your 24/7 farming companion that speaks your language. Get answers about government schemes, crop advice, and market prices instantly.",
             icon: Bot,
             color: "bg-purple-50 hover:bg-purple-100/80",
             delay: 0.5
@@ -69,9 +69,9 @@ const FeaturesSection = () => {
                     viewport={{ once: true }}
                     className="mb-16 max-w-2xl"
                 >
-                    <h2 className="text-sm font-bold tracking-wider text-green-600 uppercase mb-4">Our Protocol</h2>
+                    <h2 className="text-sm font-bold tracking-wider text-green-600 uppercase mb-4">Key Features</h2>
                     <h3 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                        Comprehensive farming solutions powered by Technology.
+                        Banking at your fingertips, in your language.
                     </h3>
                 </motion.div>
 

@@ -26,19 +26,19 @@ const HeroSection = ({ onOpenAuth }) => {
                         className="inline-flex items-center space-x-2 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100"
                     >
                         <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                        <span className="text-sm font-medium text-gray-600">AI-Powered Agriculture Protocol</span>
+                        <span className="text-sm font-medium text-gray-600">Voice-First Multilingual AI Assistant</span>
                     </motion.div>
 
                     <h1 className="text-5xl md:text-7xl font-bold text-gray-900 leading-[1.1] tracking-tight">
-                        Autonomous <br />
+                        Your Farming <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-500">
-                            Crop Protection
+                            Saathi
                         </span> <br />
-                        & Finance.
+                        in Every Language.
                     </h1>
 
                     <p className="text-lg md:text-xl text-gray-600 max-w-lg leading-relaxed">
-                        KisaanSaathi delivers instant, data-driven yield predictions and financial support to farmers worldwide, powered by advanced AI.
+                        KisaanSaathi speaks Hindi, English & Hinglish. Apply for loans, claim insurance, and get farming advice - all through voice or text.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
@@ -57,15 +57,15 @@ const HeroSection = ({ onOpenAuth }) => {
                     <div className="pt-8 flex items-center space-x-8 text-sm font-medium text-gray-500">
                         <div className="flex items-center space-x-2">
                             <Shield className="w-5 h-5 text-green-600" />
-                            <span>Secure & Audited</span>
+                            <span>Hindi & English</span>
                         </div>
                         <div className="flex items-center space-x-2">
                             <Leaf className="w-5 h-5 text-green-600" />
-                            <span>Sustainable</span>
+                            <span>Voice-First</span>
                         </div>
                         <div className="flex items-center space-x-2">
                             <TrendingUp className="w-5 h-5 text-green-600" />
-                            <span>Yield Optimized</span>
+                            <span>AI-Powered</span>
                         </div>
                     </div>
                 </motion.div>
@@ -78,51 +78,51 @@ const HeroSection = ({ onOpenAuth }) => {
                         transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
                         className="relative w-full h-full grid grid-cols-2 gap-4 transform rotate-[-6deg] scale-100 p-8"
                     >
-                        {/* Card 1: Real-time Analysis */}
+                        {/* Card 1: Voice AI Assistant */}
                         <motion.div
                             className="rounded-3xl overflow-hidden shadow-2xl relative h-[280px] bg-gray-100"
                             whileHover={{ scale: 1.02 }}
                         >
-                            <img src="/cropbg1.png" alt="Agriculture Analysis" className="w-full h-full object-cover" />
+                            <img src="/cropbg1.png" alt="Voice AI Assistant" className="w-full h-full object-cover" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent p-6 flex flex-col justify-end">
-                                <span className="text-white font-bold text-lg">Real-time Analysis</span>
-                                <span className="text-gray-200 text-sm">AI-driven crop insights</span>
+                                <span className="text-white font-bold text-lg">Voice AI Assistant</span>
+                                <span className="text-gray-200 text-sm">Speak in Hindi or English</span>
                             </div>
                         </motion.div>
 
-                        {/* Card 2: Yield Prediction (Offset down) */}
+                        {/* Card 2: Instant Loans (Offset down) */}
                         <motion.div
                             className="rounded-3xl overflow-hidden shadow-2xl relative h-[280px] mt-12 bg-gray-100"
                             whileHover={{ scale: 1.02 }}
                         >
-                            <img src="/cropbg2.png" alt="Yield Prediction" className="w-full h-full object-cover" />
+                            <img src="/cropbg2.png" alt="Loan Application" className="w-full h-full object-cover" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent p-6 flex flex-col justify-end">
-                                <span className="text-white font-bold text-lg">Yield Prediction</span>
-                                <span className="text-gray-200 text-sm">98% Accuracy Model</span>
+                                <span className="text-white font-bold text-lg">5-Minute Loans</span>
+                                <span className="text-gray-200 text-sm">Apply by just talking</span>
                             </div>
                         </motion.div>
 
-                        {/* Card 3: Instant Loans (Offset up) */}
+                        {/* Card 3: Insurance Claims (Offset up) */}
                         <motion.div
                             className="rounded-3xl overflow-hidden shadow-2xl relative h-[280px] -mt-12 bg-gray-100"
                             whileHover={{ scale: 1.02 }}
                         >
-                            <img src="/cropbg3.png" alt="Financial Support" className="w-full h-full object-cover" />
+                            <img src="/cropbg3.png" alt="Insurance Claims" className="w-full h-full object-cover" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent p-6 flex flex-col justify-end">
-                                <span className="text-white font-bold text-lg">Instant Loans</span>
-                                <span className="text-gray-200 text-sm">Smart contract disbursement</span>
+                                <span className="text-white font-bold text-lg">Insurance Claims</span>
+                                <span className="text-gray-200 text-sm">Step-by-step guidance</span>
                             </div>
                         </motion.div>
 
-                        {/* Card 4: Farmers Empowered */}
+                        {/* Card 4: Weather Alerts */}
                         <motion.div
                             className="rounded-3xl overflow-hidden shadow-2xl relative h-[280px] bg-gray-100"
                             whileHover={{ scale: 1.02 }}
                         >
-                            <img src="/cropbg4.png" alt="Farmers Empowered" className="w-full h-full object-cover" />
+                            <img src="/cropbg4.png" alt="Weather Alerts" className="w-full h-full object-cover" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent p-6 flex flex-col justify-end">
-                                <h3 className="text-3xl font-bold text-white mb-1">25K+</h3>
-                                <p className="text-gray-200 text-sm">Farmers Empowered</p>
+                                <h3 className="text-3xl font-bold text-white mb-1">🌤️</h3>
+                                <p className="text-gray-200 text-sm">Smart Weather Alerts</p>
                             </div>
                         </motion.div>
                     </motion.div>
