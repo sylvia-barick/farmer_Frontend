@@ -20,11 +20,11 @@ export const getWeather = async (lat, lon) => {
     }
 };
 
-export const getFarmSummary = async (user, weather) => {
+export const getFarmSummary = async (user, weather, satellite = null) => {
     try {
         const response = await api.post('/ai/analyze', {
             type: 'farm-summary',
-            data: { user, weather }
+            data: { user, weather, satellite }
         });
         return response.data.analysis;
     } catch (error) {
@@ -237,6 +237,25 @@ export const getSatelliteImagery = async (lat, lon, date) => {
     }
 };
 
+/**
+ * Get crop health analysis from satellite imagery (Planet.io)
+ * @param {number} lat - Latitude
+ * @param {number} lon - Longitude  
+ * @param {Array<string>} crops - List of crops being grown
+ * @returns {Promise<Object>} - { success, data: { ndvi, healthStatus, recommendations, ... } }
+ */
+export const getCropHealth = async (lat, lon, crops = []) => {
+    try {
+        const cropsParam = Array.isArray(crops) ? crops.join(',') : crops;
+        const response = await api.get('/maps/crop-health', { 
+            params: { lat, lon, crops: cropsParam } 
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching crop health:', error);
+        return { success: false, data: null };
+    }
+};
 
 export const applyLoan = async (loanData) => {
     try {

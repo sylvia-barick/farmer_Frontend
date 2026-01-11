@@ -35,7 +35,7 @@ import PastReports from "./pastRecords";
 import KisaanSaathi from "./kisaanSaathi";
 import { Menu, ClipboardList } from 'lucide-react';
 import axios from 'axios';
-import { getWeather, getFarmSummary, getAgriculturalNews } from '../services/backendApi';
+import { getWeather, getFarmSummary, getAgriculturalNews, getCropHealth } from '../services/backendApi';
 import FarmMap from './FarmMap';
 
 const FarmerDashboard = ({ user, onLogout }) => {
@@ -236,15 +236,22 @@ const FarmerDashboard = ({ user, onLogout }) => {
       // Prioritize explicit lat/long, or user data, or default
       const lat = displayData.user.locationLat || 22.5726;
       const lon = displayData.user.locationLong || 88.3639;
+      const crops = displayData.user.crops || [];
 
       try {
-        const data = await getWeather(lat, lon);
-        if (data && data.success && data.data) {
-          // Mocking 7-day structure if API returns limited data, otherwise map real data.
-          // Accessing Tomorrow.io 'timelines.daily'
-          const rawDaily = data.data.timelines?.daily || [];
+        // Fetch weather and crop health in parallel
+        const [weatherData, cropHealthData] = await Promise.all([
+          getWeather(lat, lon),
+          getCropHealth(lat, lon, crops)
+        ]);
 
-          // If API gives us daily data, map it. Otherwise mock 7 days based on current.
+        // Log Planet API response for debugging
+        console.log('[Planet API] Crop Health Response:', cropHealthData);
+
+        // Process weather data
+        if (weatherData && weatherData.success && weatherData.data) {
+          const rawDaily = weatherData.data.timelines?.daily || [];
+
           let dailyData = rawDaily.length > 0 ? rawDaily.slice(0, 7) :
             Array(7).fill(null).map((_, i) => ({
               time: new Date(Date.now() + i * 86400000).toISOString(),
@@ -260,8 +267,11 @@ const FarmerDashboard = ({ user, onLogout }) => {
 
           setWeatherForecast(mappedWeather);
 
-          // Generate AI Summary only if we have weather and user data
-          const summary = await getFarmSummary(displayData.user, mappedWeather);
+          // Extract satellite data for farm summary
+          const satelliteData = cropHealthData?.success ? cropHealthData.data : null;
+          
+          // Generate AI Summary with weather AND satellite data
+          const summary = await getFarmSummary(displayData.user, mappedWeather, satelliteData);
           setFarmSummary(summary);
 
         }
