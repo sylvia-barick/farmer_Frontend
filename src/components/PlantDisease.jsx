@@ -25,17 +25,73 @@ const PlantDisease = ({ onBack }) => {
         reader.onerror = error => reject(error);
     });
 
+    // Helper to read chunks from stream
+    const readStream = async (stream) => {
+        let fullResponse = "";
+        for await (const chunk of stream) {
+            const content = chunk.choices[0]?.delta?.content || '';
+            fullResponse += content;
+            setAnalysis((prev) => (prev ? prev + content : content)); // Stream update
+        }
+        return fullResponse;
+    };
+
     const handleAnalyze = async () => {
-        if (!description && !image) {
-            alert("Please provide an image or description of the symptoms.");
+        if (!image) { // removed description check as it is optional now
+            if (!description) {
+                // logic to allow just image
+            }
+        }
+
+        if (!image && !description) {
+            alert("Please provide an image or description.");
             return;
         }
 
         setIsLoading(true);
+        setAnalysis(""); // Reset previous analysis
+
         try {
-            // Use backend API which uses Llama 4 Maverick
-            const result = await identifyDisease(image, description);
-            setAnalysis(result);
+            // Direct Groq Call as requested
+            const Groq = (await import("groq-sdk")).Groq;
+            const groq = new Groq({
+                apiKey: import.meta.env.VITE_GROQ_API_KEY,
+                dangerouslyAllowBrowser: true
+            });
+
+            // Convert image to base64 if present
+            let imageContent = null;
+            if (image) {
+                const base64Image = await toBase64(image);
+                imageContent = {
+                    type: "image_url",
+                    image_url: { url: base64Image }
+                };
+            }
+
+            const messages = [
+                {
+                    role: "user",
+                    content: imageContent
+                        ? [
+                            { type: "text", text: description || "Analyze this plant image for diseases." },
+                            imageContent
+                        ]
+                        : description
+                }
+            ];
+
+            const chatCompletion = await groq.chat.completions.create({
+                messages: messages,
+                model: "meta-llama/llama-4-maverick-17b-128e-instruct",
+                temperature: 1,
+                max_completion_tokens: 1024,
+                top_p: 1,
+                stream: true,
+                stop: null
+            });
+
+            await readStream(chatCompletion);
 
         } catch (error) {
             console.error("Analysis failed:", error);

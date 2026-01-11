@@ -214,10 +214,50 @@ const KisaanSaathi = ({ user }) => {
         if (file) {
           setIsLoading(true);
           try {
-            const result = await identifyDisease(file, input || "Check for disease");
+            // Direct Groq Call with Llama 4 Maverick
+            const groq = new Groq({
+              apiKey: import.meta.env.VITE_GROQ_API_KEY,
+              dangerouslyAllowBrowser: true
+            });
+
+            const toBase64 = (file) => new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.readAsDataURL(file);
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = error => reject(error);
+            });
+
+            const base64Image = await toBase64(file);
+            const userDesc = input || "Analyze this plant image for diseases.";
+
+            const messages = [
+              {
+                role: "user",
+                content: [
+                  { type: "text", text: userDesc },
+                  { type: "image_url", image_url: { url: base64Image } }
+                ]
+              }
+            ];
+
+            const chatCompletion = await groq.chat.completions.create({
+              messages: messages,
+              model: "meta-llama/llama-4-maverick-17b-128e-instruct",
+              temperature: 1,
+              max_completion_tokens: 1024,
+              top_p: 1,
+              stream: true,
+              stop: null
+            });
+
+            let fullResponse = "";
+            for await (const chunk of chatCompletion) {
+              fullResponse += chunk.choices[0]?.delta?.content || '';
+            }
+
             setFlowState('IDLE');
             setIsLoading(false);
-            return `🚑 **Plant Diagnosis Report**\n\n${result}\n\nI have recorded this diagnosis. View full details in the Plant Doctor section.`;
+            return `🚑 **Plant Diagnosis Report**\n\n${fullResponse}\n\nI have recorded this diagnosis. View full details in the Plant Doctor section.`;
           } catch (e) {
             setFlowState('IDLE');
             setIsLoading(false);
