@@ -2,28 +2,28 @@
 
 The official farmer-facing frontend for **KisaanSaathi**, a next-generation AI-powered agricultural platform. This application provides farmers with intelligent tools for crop management, financial aid, disease diagnosis, and yield prediction.
 
-![KisaanSaathi Demo](public/vite.svg) *Add a screenshot here*
 
-## 🚀 Key Features
 
-### 🤖 Kisaan Saathi (AI Companion)
+##  Key Features
+
+###  Kisaan Saathi (AI Companion)
 *   **Floating Chatbot**: Accessible from anywhere in the dashboard.
 *   **Multimodal AI**: Accepts **Voice** inputs (Speech-to-Text) and **Image** uploads.
 *   **Plant Doctor**: Instant disease diagnosis using **Llama 4 Maverick** Vision AI.
 *   **Smart Flows**: Guided conversational assistance for Loans, Insurance Claims, and Yield Prediction.
 
-### 📊 Farmer Dashboard
+###  Farmer Dashboard
 *   **Loan Management**: Apply for loans with ML-driven fraud risk assessment and simulated Smart Contract disbursement.
 *   **Insurance**: File claims with policy document uploads and AI verification.
 *   **Yield Prediction**: Get yield estimates based on soil, crop, and location data using predictive models.
 *   **Weather Updates**: Real-time weather forecasts tailored to the farm's location.
 
-### 🎨 Modern UI/UX
+###  Modern UI/UX
 *   **Landing Page**: High-performance, interactive 3D Globe (Three.js), and Bauhaus/Aegis-inspired design aesthetics.
 *   **Responsive**: Fully optimized for mobile and desktop devices.
 *   **Multilingual**: Built-in translation support for regional accessibility.
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 *   **Framework**: [React 19](https://react.dev/)
 *   **Build Tool**: [Vite](https://vitejs.dev/)
@@ -33,7 +33,7 @@ The official farmer-facing frontend for **KisaanSaathi**, a next-generation AI-p
 *   **Authentication**: Firebase Auth
 *   **State Management**: React Hooks & Context
 
-## 🔧 Installation & Setup
+##  Installation & Setup
 
 ### Prerequisites
 *   Node.js (v18+)
@@ -77,7 +77,7 @@ npm run dev
 ```
 Access the app at `http://localhost:5173`.
 
-## 📦 Build & Production
+##  Build & Production
 
 To build the application for production:
 
@@ -91,7 +91,7 @@ You can preview the production build locally:
 npm run preview
 ```
 
-## 🐳 Docker Deployment
+##  Docker Deployment
 
 To containerize the frontend:
 
@@ -106,7 +106,7 @@ To containerize the frontend:
     ```
     *(Note: Ensure your Nginx/server config inside Docker handles client-side routing)*
 
-## 🤝 Contributing
+##  Contributing
 
 1.  Fork the repository.
 2.  Create a feature branch (`git checkout -b feature/AmazingFeature`).
