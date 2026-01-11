@@ -1,53 +1,34 @@
 import React from 'react'
-import {motion} from 'framer-motion'
-import logo from '../assets/logo.png'
+import { motion } from 'framer-motion'
 import Navbar from '../components/Navbar';
+import HeroSection from '../components/Landing/HeroSection';
+import FeaturesSection from '../components/Landing/FeaturesSection';
+import WorkflowSection from '../components/Landing/WorkflowSection';
 import '../App.css'
-export default function Landing(){
 
-  return (
-    <motion.div
-    className='w-[100vw] min-h-[100vh] bg-white'>
+export default function Landing() {
+    return (
+        <div className='w-full min-h-screen bg-white'>
+            {/* Navbar Container */}
+            <div className='fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100'>
+                <div className='px-4 md:px-16 py-4'>
+                    <Navbar />
+                </div>
+            </div>
 
-    {/* Navbar */}
-    <div className='h-[12vh] w-[100vw] px-4 md:px-16 bg-lightBg'>
-        <Navbar/>
-    </div>
+            {/* Main Content */}
+            <main>
+                <HeroSection />
+                <FeaturesSection />
+                <WorkflowSection />
+            </main>
 
-    <div 
-    className='bg-landing flex justify-center md:justify-start items-center 
-    w-full h-[88vh] 
-    px-4 md:px-20 '>
-        {/* Hero */}
-        <div 
-        className='h-auto w-[90%] md:h-[80%] md:w-[60%]
-        bg-lightBg rounded-xl bg-opacity-70
-        p-6 md:p-10'>
-            <div className='w-full h-[30%] md:h-[40%] mb-4'>
-                <h1 className='text-2xl md:text-[3.4rem] leading-snug 
-                font-bold text-primary'>Empowering farmers with    
-                    data-backed financial support
-                </h1>
-            </div>
-            <div className='w-full md:w-[80%] h-[30%] mb-6'>
-                <p className='text-xs md:text-[1.2rem] leading-snug font-bold text-darkBg'>
-                Empowering farmers with comprehensive, data-driven yield prediction reports, 
-                streamlining the loan approval process through transparency, accountability, 
-                and visually engaging infographics that build trust and ease financial transactions.
-                </p>
-            </div>
-            <div className='w-full h-[20%] flex items-center mb-4'>
-                <button 
-                className='px-4 py-2 md:px-10 md:py-3
-                bg-accent text-sm md:text-xl text-darkBg 
-                rounded-lg font-bold mr-2'>Get started</button>
-                <button 
-                className='px-4 py-2 md:px-10 md:py-3 
-                bg-darkBg text-sm md:text-xl text-white 
-                rounded-lg font-bold ml-2'>Learn more</button>
-            </div>
+            {/* Simple Footer */}
+            <footer className="bg-gray-900 text-white py-12">
+                <div className="container mx-auto px-6 md:px-12 text-center">
+                    <p className="text-gray-400">© 2025 AgroSure. All rights reserved.</p>
+                </div>
+            </footer>
         </div>
-    </div>
-    </motion.div>
-  );
+    );
 };

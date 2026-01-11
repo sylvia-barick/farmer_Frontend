@@ -6,7 +6,7 @@ import html2canvas from 'html2canvas';
 const YieldResults = ({ results, user, onBackToDashboard }) => {
 
   const marketPriceCalculator = (cropName, predictedYieldKgPerAcre) => {
-    return cropPricesPerKgHowrah[cropName.toLowerCase()]*predictedYieldKgPerAcre*results.acresOfLand;
+    return cropPricesPerKgHowrah[cropName.toLowerCase()] * predictedYieldKgPerAcre * results.acresOfLand;
   }
   const cropPricesPerKgHowrah = {
     rice: 42.0, // Average price in Howrah as of April 10, 2025. West Bengal average is 40.4 INR/kg as of July 10, 2025.
@@ -17,7 +17,7 @@ const YieldResults = ({ results, user, onBackToDashboard }) => {
     cotton: 72.3, // India average for unginned cotton. Howrah specific raw cotton prices vary widely, from 67 INR/kg upwards.
     millet: 60.0 // Average from various millet types listed in Kolkata, e.g., Foxtail Millet at 60 INR/kg. Prices for specific millet types can vary significantly (e.g., Barnyard around 85 INR/kg).
   };
-  
+
   console.log(cropPricesPerKgHowrah);
   // Transform API response to match component expectations
   const transformedResults = {
@@ -43,7 +43,7 @@ const YieldResults = ({ results, user, onBackToDashboard }) => {
       `Consider crop rotation with suggested crops: ${results.suggestedCrops?.map(crop => crop.cropName).join(', ') || 'N/A'}`,
       `Expected harvest date: ${results.expectedHarvestDate || 'Not specified'}`
     ],
-    projectedRevenue: marketPriceCalculator(results.cropName, results.predictedYieldKgPerAcre) || 25000*results.acresOfLand, // Assuming ₹25/kg
+    projectedRevenue: marketPriceCalculator(results.cropName, results.predictedYieldKgPerAcre) || 25000 * results.acresOfLand, // Assuming ₹25/kg
     marketPrice: cropPricesPerKgHowrah[results.cropName.toLowerCase()] || 45.50, // ₹25,000 per ton
     riskIndex: Math.round(results.climateScore || 50),
     weatherIndex: Math.round(results.climateScore || 50),
@@ -70,7 +70,7 @@ const YieldResults = ({ results, user, onBackToDashboard }) => {
       reportContainer.style.padding = '40px';
       reportContainer.style.fontFamily = 'Arial, sans-serif';
       reportContainer.style.color = '#333';
-      
+
       // Generate the report HTML
       reportContainer.innerHTML = `
         <div style="text-align: center; margin-bottom: 30px;">
@@ -176,7 +176,7 @@ const YieldResults = ({ results, user, onBackToDashboard }) => {
       const pdfHeight = pdf.internal.pageSize.getHeight();
       const imgWidth = pdfWidth - 20; // 10mm margin on each side
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
+
       let heightLeft = imgHeight;
       let position = 10; // 10mm top margin
 
@@ -202,15 +202,15 @@ const YieldResults = ({ results, user, onBackToDashboard }) => {
 
       // Show success message
       alert('Report downloaded successfully!');
-      
+
     } catch (error) {
       console.error('Error generating PDF:', error);
-      
+
       // Reset button state
       const downloadButton = document.querySelector('[data-download-report]');
       downloadButton.innerHTML = '<Download className="h-4 w-4 mr-2" />Download PDF Report';
       downloadButton.disabled = false;
-      
+
       alert('Error generating PDF. Please try again.');
     }
   };
@@ -231,28 +231,28 @@ const YieldResults = ({ results, user, onBackToDashboard }) => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4">
+    <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 bg-agricultural-soft-sand min-h-screen">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
         <div>
-          <button 
+          <button
             onClick={onBackToDashboard}
-            className="mb-4 flex items-center text-brown-700 hover:bg-yellow-100 px-3 py-1 rounded"
+            className="mb-4 inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-bold border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] h-10 px-4 py-2 text-gray-900 transition-all"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </button>
-          <h1 className="text-3xl font-bold text-brown-700 mb-2">
+          <h1 className="text-3xl sm:text-4xl font-black text-gray-900 mb-2">
             Yield Prediction Report
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 font-medium">
             {transformedResults.crop} • {transformedResults.acres} acres • {user?.location ? `${user.location.lat}, ${user.location.long}` : 'Location not set'}
           </p>
         </div>
-        <button 
+        <button
           onClick={handleDownloadReport}
           data-download-report
-          className="bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center"
+          className="bg-green-600 text-white font-black uppercase tracking-wider h-12 px-6 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center text-sm w-full sm:w-auto"
         >
           <Download className="h-4 w-4 mr-2" />
           Download PDF Report
@@ -261,64 +261,81 @@ const YieldResults = ({ results, user, onBackToDashboard }) => {
 
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Main Results */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="shadow p-6 border rounded">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-brown-700 font-semibold">Prediction Confidence</h2>
-              <span className="bg-green-700 text-white px-2 py-1 rounded text-sm">
-                86.5% Confidence
-              </span>
-            </div>
-            <div className="text-center mb-6">
-              <div className="text-5xl font-bold text-green-700 mb-2">
-                {transformedResults.predictedYield.toFixed(1)} KG
+        <div className="lg:col-span-2 space-y-8">
+          <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+            <div className="flex flex-col space-y-1.5 p-6 border-b-2 border-black bg-green-50">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-black text-gray-900">Prediction Confidence</h2>
+                <span className="bg-green-600 text-white px-3 py-1 rounded-lg border-2 border-black text-xs font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                  {Math.round(transformedResults.confidenceScore)}% Confidence
+                </span>
               </div>
-              <p className="text-gray-600">
-                Predicted yield for {transformedResults.acres} acres of {transformedResults.crop}
-              </p>
             </div>
-            <div className="mb-4">
-              <div className="flex justify-between text-sm mb-1 text-gray-600">
-                <span>Climate Score</span>
-                <span className="font-semibold text-brown-700">{transformedResults.confidenceScore}/100</span>
+
+            <div className="p-8">
+              <div className="text-center mb-8">
+                <div className="text-5xl sm:text-6xl font-black text-green-700 mb-2 drop-shadow-sm">
+                  {transformedResults.predictedYield.toFixed(1)} <span className="text-2xl sm:text-3xl text-gray-600">KG</span>
+                </div>
+                <p className="text-gray-600 font-bold">
+                  Predicted yield for {transformedResults.acres} acres of {transformedResults.crop}
+                </p>
               </div>
-              <div className="h-3 bg-gray-200 rounded overflow-hidden">
-                <div className="h-full bg-green-600" style={{ width: `${transformedResults.confidenceScore}%` }} />
+              <div className="mb-4">
+                <div className="flex justify-between text-sm mb-2 text-gray-900 font-bold uppercase tracking-wide">
+                  <span>Climate Score</span>
+                  <span>{transformedResults.confidenceScore}/100</span>
+                </div>
+                <div className="h-4 bg-gray-100 rounded-full border-2 border-black overflow-hidden relative">
+                  <div className="h-full bg-green-500 absolute top-0 left-0 border-r-2 border-black" style={{ width: `${transformedResults.confidenceScore}%` }} />
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="shadow p-6 border rounded">
-            <h2 className="text-brown-700 font-semibold mb-4">Risk Analysis</h2>
-            <div className="space-y-4">
+          <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+            <div className="p-6 border-b-2 border-black bg-yellow-50">
+              <h2 className="text-xl font-black text-gray-900">Risk Analysis</h2>
+            </div>
+            <div className="p-6 space-y-6">
               {transformedResults.riskFactors.map((factor, index) => (
                 <div key={index}>
                   <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-brown-700 font-medium">{factor.factor}</span>
-                      <span className={`px-2 py-0.5 rounded text-sm ${getStatusColor(factor.status)}`}>
+                    <div className="flex items-center space-x-3">
+                      <span className="text-gray-900 font-bold">{factor.factor}</span>
+                      <span className={`px-2 py-0.5 rounded-md border-2 border-black text-xs font-bold uppercase ${factor.status === 'excellent' ? 'bg-green-100 text-green-800' :
+                          factor.status === 'good' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
+                        }`}>
                         {factor.status}
                       </span>
                     </div>
-                    <span className={`font-semibold ${getRiskColor(factor.score)}`}>
+                    <span className={`font-black ${factor.score >= 85 ? 'text-green-700' :
+                        factor.score >= 70 ? 'text-yellow-600' : 'text-orange-600'
+                      }`}>
                       {factor.score}/100
                     </span>
                   </div>
-                  <div className="h-2 bg-gray-200 rounded overflow-hidden">
-                    <div className="h-full bg-green-600" style={{ width: `${factor.score}%` }} />
+                  <div className="h-3 bg-gray-100 rounded-full border-2 border-black overflow-hidden relative">
+                    <div className={`h-full absolute top-0 left-0 border-r-2 border-black ${factor.score >= 85 ? 'bg-green-500' :
+                        factor.score >= 70 ? 'bg-yellow-500' : 'bg-orange-500'
+                      }`} style={{ width: `${factor.score}%` }} />
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="shadow p-6 border rounded">
-            <h2 className="text-brown-700 font-semibold mb-4">Recommendations</h2>
-            <div className="space-y-3">
+          <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+            <div className="p-6 border-b-2 border-black bg-blue-50">
+              <h2 className="text-xl font-black text-gray-900">Recommendations</h2>
+            </div>
+            <div className="p-6 space-y-4">
               {transformedResults.recommendations.map((rec, index) => (
-                <div key={index} className="flex items-start space-x-3">
-                  <CheckCircle className="h-5 w-5 text-green-700 mt-1" />
-                  <span className="text-brown-700">{rec}</span>
+                <div key={index} className="flex items-start space-x-3 bg-gray-50 p-4 rounded-xl border-2 border-black">
+                  <div className="bg-green-100 p-1 rounded-md border-2 border-black flex-shrink-0">
+                    <CheckCircle className="h-4 w-4 text-green-700" />
+                  </div>
+                  <span className="text-gray-900 font-bold">{rec}</span>
                 </div>
               ))}
             </div>
@@ -326,104 +343,117 @@ const YieldResults = ({ results, user, onBackToDashboard }) => {
         </div>
 
         {/* Right Column */}
-        <div className="space-y-6">
-          <div className="shadow p-6 border rounded">
-            <div className="flex items-center mb-4 text-brown-700 font-semibold">
-              <DollarSign className="h-5 w-5 mr-2" />
-              Financial Projection
+        <div className="space-y-8">
+          <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+            <div className="p-6 border-b-2 border-black bg-white">
+              <div className="flex items-center text-gray-900 font-black text-lg">
+                <DollarSign className="h-5 w-5 mr-2 text-green-700" />
+                Financial Projection
+              </div>
             </div>
-            <div className="text-center mb-4">
-              <div className="text-2xl font-bold text-green-700 mb-1">
-                ₹{transformedResults.projectedRevenue.toLocaleString()}
+
+            <div className="p-6">
+              <div className="text-center mb-6 bg-green-50 p-4 rounded-xl border-2 border-black border-dashed">
+                <div className="text-3xl font-black text-green-700 mb-1">
+                  ₹{transformedResults.projectedRevenue.toLocaleString()}
+                </div>
+                <p className="text-xs text-gray-600 font-bold uppercase tracking-wider">Projected Revenue</p>
               </div>
-              <p className="text-sm text-gray-600">Projected Revenue</p>
-            </div>
-            <hr />
-            <div className="mt-4 space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Yield (tons):</span>
-                <span className="font-semibold text-brown-700">{transformedResults.predictedYield.toFixed(1)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Market Price/kg:</span>
-                <span className="font-semibold text-brown-700">₹{transformedResults.marketPrice.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Total Revenue:</span>
-                <span className="font-semibold text-green-700">₹{transformedResults.projectedRevenue.toLocaleString()}</span>
+
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between items-center p-2 hover:bg-gray-50 rounded-lg transition-colors">
+                  <span className="text-gray-600 font-bold">Yield (tons):</span>
+                  <span className="font-black text-gray-900">{transformedResults.predictedYield.toFixed(1)}</span>
+                </div>
+                <div className="flex justify-between items-center p-2 hover:bg-gray-50 rounded-lg transition-colors">
+                  <span className="text-gray-600 font-bold">Market Price/kg:</span>
+                  <span className="font-black text-gray-900">₹{transformedResults.marketPrice.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-green-50 rounded-lg border-2 border-black">
+                  <span className="text-green-800 font-bold">Total Revenue:</span>
+                  <span className="font-black text-green-800">₹{transformedResults.projectedRevenue.toLocaleString()}</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="shadow p-6 border rounded">
-            <div className="flex items-center mb-4 text-brown-700 font-semibold">
-              <Shield className="h-5 w-5 mr-2" />
-              Bank Assessment
+          <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+            <div className="p-6 border-b-2 border-black bg-white">
+              <div className="flex items-center text-gray-900 font-black text-lg">
+                <Shield className="h-5 w-5 mr-2 text-yellow-600" />
+                Bank Assessment
+              </div>
             </div>
-            <div className="text-center mb-4">
-              <div className="flex justify-center space-x-1 mb-2">
-                {Array.from({ length: 5 }, (_, i) => (
-                  <Award
-                    key={i}
-                    className={`h-5 w-5 ${
-                      i < 4 ? 'text-yellow-500 fill-current' : 'text-gray-400'
-                    }`}
-                  />
-                ))}
+
+            <div className="p-6">
+              <div className="text-center mb-6">
+                <div className="flex justify-center space-x-1 mb-2">
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <Award
+                      key={i}
+                      className={`h-6 w-6 ${i < 4 ? 'text-yellow-500 fill-current drop-shadow-sm' : 'text-gray-300'
+                        }`}
+                    />
+                  ))}
+                </div>
+                <p className="text-xs text-gray-600 font-bold uppercase tracking-wider">Creditworthiness Rating</p>
               </div>
-              <p className="text-sm text-gray-600">Creditworthiness Rating</p>
-            </div>
-            <hr />
-            <div className="mt-4 space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Risk Index:</span>
-                <span className={`font-semibold ${getRiskColor(transformedResults.riskIndex)}`}>
-                  {transformedResults.riskIndex >= 85 ? 'Low' : transformedResults.riskIndex >= 70 ? 'Medium' : 'High'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Weather Index:</span>
-                <span className="font-semibold text-brown-700">{transformedResults.weatherIndex}/100</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Success Probability:</span>
-                <span className="font-semibold text-green-700">{transformedResults.confidenceScore}%</span>
+
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between items-center p-2 border-b-2 border-black/10">
+                  <span className="text-gray-600 font-bold">Risk Index:</span>
+                  <span className={`font-black uppercase text-xs px-2 py-0.5 rounded border-2 border-black ${transformedResults.riskIndex >= 85 ? 'bg-green-100 text-green-800' :
+                      transformedResults.riskIndex >= 70 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                    {transformedResults.riskIndex >= 85 ? 'Low' : transformedResults.riskIndex >= 70 ? 'Medium' : 'High'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-2 border-b-2 border-black/10">
+                  <span className="text-gray-600 font-bold">Weather Index:</span>
+                  <span className="font-black text-gray-900">{transformedResults.weatherIndex}/100</span>
+                </div>
+                <div className="flex justify-between items-center p-2">
+                  <span className="text-gray-600 font-bold">Success Probability:</span>
+                  <span className="font-black text-green-700">{transformedResults.confidenceScore}%</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="shadow p-6 border rounded">
-            <h2 className="text-brown-700 font-semibold mb-4">Report Details</h2>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Location:</span>
-                <span className="font-semibold text-brown-700">{transformedResults.location}</span>
+          <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+            <div className="p-6 border-b-2 border-black bg-gray-50">
+              <h2 className="text-lg font-black text-gray-900">Report Details</h2>
+            </div>
+            <div className="p-6 space-y-3 text-sm">
+              <div className="flex justify-between border-b-2 border-black/5 pb-2">
+                <span className="text-gray-600 font-bold">Location:</span>
+                <span className="font-black text-gray-900 text-right max-w-[150px] truncate">{transformedResults.location}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Generated:</span>
-                <span className="font-semibold text-brown-700">
+              <div className="flex justify-between border-b-2 border-black/5 pb-2">
+                <span className="text-gray-600 font-bold">Generated:</span>
+                <span className="font-black text-gray-900">
                   {new Date(transformedResults.generatedAt).toLocaleDateString()}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Valid Until:</span>
-                <span className="font-semibold text-brown-700">
+                <span className="text-gray-600 font-bold">Valid Until:</span>
+                <span className="font-black text-gray-900">
                   {new Date(new Date(transformedResults.generatedAt).getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="space-y-3">
-            <button 
+          <div className="space-y-4">
+            <button
               onClick={handleDownloadReport}
-              className="w-full bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center justify-center"
+              className="w-full bg-green-600 hover:bg-green-500 text-white font-black uppercase tracking-wider h-12 px-4 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center"
             >
               <Download className="h-4 w-4 mr-2" />
               Download Full Report
             </button>
-            <button 
-              className="w-full border border-gray-400 text-brown-700 hover:bg-yellow-100 px-4 py-2 rounded flex items-center justify-center"
+            <button
+              className="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-black uppercase tracking-wider h-12 px-4 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center"
             >
               <TrendingUp className="h-4 w-4 mr-2" />
               Generate New Prediction

@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_MAIN_BACKEND_URL || 'http://localhost:5000/api';
+const API_ROOT_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
 const api = axios.create({
     baseURL: API_URL,
@@ -134,6 +135,51 @@ export const getSatelliteImagery = async (lat, lon, date) => {
         return response.data;
     } catch (error) {
         console.error('Error fetching satellite imagery:', error);
+        throw error;
+    }
+};
+
+
+export const applyLoan = async (loanData) => {
+    try {
+        // Use API_ROOT_URL because loan routes are at /loan, not /api/loan
+        const response = await axios.post(`${API_ROOT_URL}/loan/apply`, loanData, {
+            headers: { 'Content-Type': 'application/json' }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error applying for loan:', error);
+        throw error;
+    }
+};
+
+export const submitInsuranceClaim = async (formData) => {
+    try {
+        // Use API_ROOT_URL because insurance routes are at /insurance, not /api/insurance
+        const response = await axios.post(`${API_ROOT_URL}/insurance/create`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error submitting insurance claim:', error);
+        throw error;
+    }
+};
+
+export const submitYieldPrediction = async (predictionData) => {
+    // Note: Yield prediction usually comes from an LLM/AI service directly in the frontend component 
+    // or a specific backend endpoint. If the user wants to "submit" a request for prediction:
+    // We already have 'analyzeYield' which calls '/ai/analyze' with type 'yield'. 
+    // But if there is a specific DB record to be created, we might need a dedicated endpoint. 
+    // Based on 'YieldPredictionForm.jsx', it uses Groq directly. 
+    // For now, we will wrap the AI analysis as the "submission" or create a record if the backend supports it.
+    // Assuming we just want to get the prediction:
+    try {
+        // Re-using the logic from YieldPredictionForm would be ideal, but here we simply expose an endpoint 
+        // if the backend implementation follows the pattern. 
+        // Let's assume we use the existing analyzeYield for now, but if persistence is needed, we'd add it here.
+        return await analyzeYield(predictionData);
+    } catch (error) {
         throw error;
     }
 };

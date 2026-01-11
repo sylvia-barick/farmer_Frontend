@@ -445,7 +445,7 @@ const FarmerDashboard = ({ user, onLogout }) => {
                 { id: 'insurance-claim', label: 'Insurance Claim', icon: Shield },
                 { id: 'past-reports', label: 'Past Reports', icon: FileText },
                 { id: 'plant-disease', label: 'Plant Doctor', icon: Leaf },
-                { id: 'kisaan-saathi', label: 'Kisaan Saathi', icon: MessageCircle }
+
               ].map((item) => (
                 <button
                   key={item.id}
@@ -484,36 +484,36 @@ const FarmerDashboard = ({ user, onLogout }) => {
                 <div className="lg:col-span-2 space-y-8">
 
                   {/* AI Farm Summary */}
-                  <div className="rounded-lg border bg-gradient-to-br from-green-50 to-white text-card-foreground shadow-sm warm-shadow border-agricultural-stone-gray/20">
-                    <div className="flex flex-col space-y-1.5 p-6">
-                      <h3 className="flex items-center text-xl font-semibold leading-none text-agricultural-soil-brown">
-                        <Leaf className="h-5 w-5 mr-2 text-agricultural-forest-green" />
+                  <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-300">
+                    <div className="flex flex-col space-y-1.5 p-6 border-b-2 border-black bg-green-50 rounded-t-2xl">
+                      <h3 className="flex items-center text-xl font-bold leading-none text-gray-900">
+                        <Leaf className="h-6 w-6 mr-2 text-green-700" />
                         Daily Farm Insight
                       </h3>
                     </div>
-                    <div className="p-6 pt-0">
-                      <div className="whitespace-pre-line text-sm text-gray-700 leading-relaxed">
+                    <div className="p-6">
+                      <div className="whitespace-pre-line text-sm text-gray-700 leading-relaxed font-medium">
                         {farmSummary}
                       </div>
                     </div>
                   </div>
 
                   {/* Quick Actions */}
-                  <div className="rounded-lg border bg-white text-card-foreground shadow-sm warm-shadow border-agricultural-stone-gray/20">
-                    <div className="flex flex-col space-y-1.5 p-6">
-                      <h3 className="text-2xl font-semibold leading-none tracking-tight text-agricultural-soil-brown">Quick Actions</h3>
+                  <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                    <div className="flex flex-col space-y-1.5 p-6 border-b-2 border-black">
+                      <h3 className="text-2xl font-bold leading-none tracking-tight text-gray-900">Quick Actions</h3>
                     </div>
-                    <div className="p-6 pt-0">
+                    <div className="p-6">
                       <div className="grid grid-cols-2 gap-4">
                         <button
-                          className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium bg-agricultural-forest-green hover:bg-agricultural-crop-green text-white h-auto py-4 flex-col space-y-2 transition-colors"
+                          className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-bold bg-green-600 text-white h-auto py-4 flex-col space-y-2 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                           onClick={() => setActiveSection('prediction')}
                         >
                           <TrendingUp className="h-6 w-6" />
                           <span>New Yield Prediction</span>
                         </button>
                         <button
-                          className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium border border-agricultural-stone-gray bg-white text-agricultural-soil-brown h-auto py-4 flex-col space-y-2 hover:bg-agricultural-soft-sand transition-colors"
+                          className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-bold bg-white text-gray-900 h-auto py-4 flex-col space-y-2 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                           onClick={() => setActiveSection('loan-application')}
                         >
                           <Download className="h-6 w-6" />
@@ -524,26 +524,26 @@ const FarmerDashboard = ({ user, onLogout }) => {
                   </div>
 
                   {/* Farming Feed */}
-                  <div className="rounded-lg border bg-white text-card-foreground shadow-sm warm-shadow border-agricultural-stone-gray/20">
-                    <div className="flex flex-col space-y-1.5 p-6">
-                      <h3 className="flex items-center text-2xl font-semibold leading-none tracking-tight text-agricultural-soil-brown">
+                  <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                    <div className="flex flex-col space-y-1.5 p-6 border-b-2 border-black">
+                      <h3 className="flex items-center text-2xl font-bold leading-none tracking-tight text-gray-900">
                         <Calendar className="h-5 w-5 mr-2" />
                         Agricultural News
                       </h3>
                     </div>
-                    <div className="p-6 pt-0 max-h-[40vh] overflow-y-auto space-y-4 custom-scrollbar">
+                    <div className="p-6 max-h-[40vh] overflow-y-auto space-y-4 custom-scrollbar">
                       {farmingNews?.map((news, index) => (
-                        <div key={index} className="border-b border-agricultural-stone-gray/20 last:border-0 pb-4 last:pb-0">
+                        <div key={index} className="border-b-2 border-gray-100 last:border-0 pb-4 last:pb-0">
                           <div className="flex justify-between items-start mb-2">
-                            <h3 className="font-medium text-agricultural-soil-brown text-sm line-clamp-2">
+                            <h3 className="font-bold text-gray-900 text-sm line-clamp-2 hover:text-green-600 cursor-pointer">
                               {news.title}
                             </h3>
-                            <span className="text-xs text-agricultural-stone-gray whitespace-nowrap ml-2">{news.time}</span>
+                            <span className="text-xs font-mono text-gray-500 whitespace-nowrap ml-2 bg-gray-100 px-2 py-1 rounded-md border border-gray-300">{news.time}</span>
                           </div>
                           <span
-                            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors ${news.type === 'price-update' ? 'border-agricultural-crop-green text-agricultural-crop-green' :
-                              news.type === 'policy' ? 'border-agricultural-harvest-gold text-agricultural-harvest-gold' :
-                                'border-agricultural-drought-orange text-agricultural-drought-orange'
+                            className={`inline-flex items-center rounded-lg border-2 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider ${news.type === 'price-update' ? 'border-green-600 text-green-700 bg-green-50' :
+                              news.type === 'policy' ? 'border-yellow-500 text-yellow-700 bg-yellow-50' :
+                                'border-orange-500 text-orange-700 bg-orange-50'
                               }`}
                           >
                             {news.type.replace('-', ' ')}
@@ -559,76 +559,78 @@ const FarmerDashboard = ({ user, onLogout }) => {
                 <div className="lg:col-span-1 space-y-6">
 
                   {/* Map Widget */}
-                  <div className="rounded-lg border bg-white text-card-foreground shadow-sm warm-shadow border-agricultural-stone-gray/20">
-                    <div className="flex flex-col space-y-1.5 p-6">
-                      <h3 className="flex items-center text-2xl font-semibold leading-none tracking-tight text-agricultural-soil-brown">
+                  <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                    <div className="flex flex-col space-y-1.5 p-6 border-b-2 border-black bg-white">
+                      <h3 className="flex items-center text-xl font-bold leading-none tracking-tight text-gray-900">
                         <MapPin className="h-5 w-5 mr-2" />
                         Farm Location
                       </h3>
                     </div>
-                    <div className="p-4 pt-0">
+                    <div className="p-0">
                       {displayData.user.locationLat && displayData.user.locationLong ? (
-                        <FarmMap lat={displayData.user.locationLat} lon={displayData.user.locationLong} />
+                        <div className="border-b-2 border-black">
+                          <FarmMap lat={displayData.user.locationLat} lon={displayData.user.locationLong} />
+                        </div>
                       ) : (
-                        <div className="h-[300px] w-full bg-gray-100 flex items-center justify-center rounded-lg">
-                          <span className="text-gray-500">Location not set</span>
+                        <div className="h-[300px] w-full bg-gray-100 flex items-center justify-center">
+                          <span className="text-gray-500 font-bold">Location not set</span>
                         </div>
                       )}
                     </div>
                   </div>
 
                   {/* Weather Forecast Widget (7 Days) */}
-                  <div className="rounded-lg border bg-white text-card-foreground shadow-sm warm-shadow border-agricultural-stone-gray/20">
-                    <div className="flex flex-col space-y-1.5 p-6">
-                      <h3 className="flex items-center text-2xl font-semibold leading-none tracking-tight text-agricultural-soil-brown">
+                  <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                    <div className="flex flex-col space-y-1.5 p-6 border-b-2 border-black">
+                      <h3 className="flex items-center text-xl font-bold leading-none tracking-tight text-gray-900">
                         <Cloud className="h-5 w-5 mr-2" />
                         7-Day Forecast
                       </h3>
                     </div>
-                    <div className="p-6 pt-0 space-y-3">
+                    <div className="p-4 space-y-2">
                       {weatherForecast.length > 0 ? (
                         weatherForecast.map((day, index) => (
-                          <div key={index} className="flex items-center justify-between p-2 hover:bg-agricultural-soft-sand rounded-lg transition-colors">
+                          <div key={index} className="flex items-center justify-between p-3 bg-gray-50 border-2 border-transparent hover:border-black hover:shadow-md rounded-xl transition-all cursor-default">
                             <div className="flex items-center space-x-3">
-                              <day.icon className="h-5 w-5 text-agricultural-forest-green" />
+                              <day.icon className="h-6 w-6 text-gray-700" />
                               <div>
-                                <div className="font-medium text-agricultural-soil-brown text-sm">
+                                <div className="font-bold text-gray-900 text-sm">
                                   {day.date}
                                 </div>
-                                <div className="text-xs text-agricultural-stone-gray">{day.condition}</div>
+                                <div className="text-xs text-gray-500 font-medium">{day.condition}</div>
                               </div>
                             </div>
-                            <div className="font-semibold text-agricultural-soil-brown">{day.temp}</div>
+                            <div className="font-black text-gray-900">{day.temp}</div>
                           </div>
                         ))
                       ) : (
-                        <div className="text-center py-4 text-gray-500">Loading forecast...</div>
+                        <div className="text-center py-4 text-gray-500 font-medium">Loading forecast...</div>
                       )}
                     </div>
                   </div>
 
                   {/* Farm Summary */}
-                  <div className="rounded-lg border bg-white text-card-foreground shadow-sm warm-shadow border-agricultural-stone-gray/20">
-                    <div className="flex flex-col space-y-1.5 p-6">
-                      <h3 className="text-2xl font-semibold leading-none tracking-tight text-agricultural-soil-brown">Farm Stats</h3>
+                  <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                    <div className="flex flex-col space-y-1.5 p-6 border-b-2 border-black bg-yellow-50 rounded-t-2xl">
+                      <h3 className="text-xl font-bold leading-none tracking-tight text-gray-900">Farm Stats</h3>
                     </div>
-                    <div className="p-6 pt-0 space-y-4">
-                      <div className="space-y-3">
-                        <div className="flex justify-between">
-                          <span className="text-agricultural-stone-gray">Total Land:</span>
-                          <span className="font-semibold text-agricultural-soil-brown">{displayData?.user?.totalLand || 0} acres</span>
+                    <div className="p-6 space-y-4">
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center pb-2 border-b border-gray-100">
+                          <span className="text-gray-600 font-medium">Total Land</span>
+                          <span className="font-bold text-gray-900 bg-gray-100 px-3 py-1 rounded-full border border-gray-200">{displayData?.user?.totalLand || 0} acres</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-agricultural-stone-gray">Active Crops:</span>
-                          <span className="font-semibold text-agricultural-soil-brown">{displayData?.user?.crops?.length || 0}</span>
+                        <div className="flex justify-between items-center pb-2 border-b border-gray-100">
+                          <span className="text-gray-600 font-medium">Active Crops</span>
+                          <span className="font-bold text-gray-900">{displayData?.user?.crops?.length || 0}</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-agricultural-stone-gray">Reports Generated:</span>
-                          <span className="font-semibold text-agricultural-crop-green">3</span>
+                        <div className="flex justify-between items-center pb-2 border-b border-gray-100">
+                          <span className="text-gray-600 font-medium">Reports</span>
+                          <span className="font-bold text-green-600">3</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-agricultural-stone-gray">Success Rate:</span>
-                          <span className="font-semibold text-agricultural-crop-green">94%</span>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600 font-medium">Success Rate</span>
+                          <span className="font-bold text-green-600">94%</span>
                         </div>
                       </div>
                     </div>
@@ -678,13 +680,7 @@ const FarmerDashboard = ({ user, onLogout }) => {
               </div>
             )
           }
-          {
-            activeSection === 'kisaan-saathi' && (
-              <KisaanSaathi
-                onBack={() => setActiveSection('dashboard')}
-              />
-            )
-          }
+
 
           {
             activeSection === 'past-reports' && (
@@ -703,6 +699,7 @@ const FarmerDashboard = ({ user, onLogout }) => {
             )
           }
         </div >
+        <KisaanSaathi user={displayData?.user} />
       </div >
     </div >
   );

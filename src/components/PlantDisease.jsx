@@ -48,56 +48,66 @@ const PlantDisease = ({ onBack }) => {
     return (
         <div className="min-h-screen bg-agricultural-soft-sand p-8">
             <div className="max-w-4xl mx-auto">
-                <button onClick={onBack} className="mb-4 text-agricultural-soil-brown hover:underline flex items-center">
+                <button
+                    onClick={onBack}
+                    className="mb-6 inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-bold border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] h-10 px-4 py-2 text-gray-900 transition-all"
+                >
                     &larr; Back to Dashboard
                 </button>
 
-                <div className="bg-white rounded-lg shadow-lg overflow-hidden warm-shadow border border-agricultural-stone-gray/20">
-                    <div className="p-6 border-b border-agricultural-stone-gray/20 bg-agricultural-forest-green/5">
-                        <h2 className="text-2xl font-bold text-agricultural-soil-brown flex items-center">
-                            <Leaf className="mr-2 h-6 w-6 text-agricultural-forest-green" />
+                <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                    <div className="p-6 border-b-2 border-black bg-green-50">
+                        <h2 className="text-2xl font-black text-gray-900 flex items-center">
+                            <Leaf className="mr-3 h-8 w-8 text-green-700" />
                             Plant Doctor (Disease Detection)
                         </h2>
-                        <p className="text-agricultural-stone-gray text-sm mt-1">
+                        <p className="text-gray-600 font-medium text-sm mt-2 ml-1">
                             Upload a photo or describe symptoms to get instant diagnosis and treatment advice.
                         </p>
                     </div>
 
-                    <div className="p-6 grid md:grid-cols-2 gap-8">
+                    <div className="p-8 grid md:grid-cols-2 gap-8">
                         {/* Input Section */}
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-sm font-medium text-agricultural-soil-brown mb-2">
+                                <label className="block text-sm font-bold text-gray-900 mb-2">
                                     1. Upload Plant Photo
                                 </label>
-                                <div className="border-2 border-dashed border-agricultural-stone-gray/30 rounded-lg p-6 text-center hover:bg-agricultural-soft-sand transition-colors">
+                                <div className="border-2 border-dashed border-black rounded-xl p-6 text-center hover:bg-gray-50 transition-colors bg-white relative group">
                                     <input
                                         type="file"
                                         accept="image/*"
                                         onChange={handleImageChange}
-                                        className="hidden"
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                         id="plant-upload"
                                     />
-                                    <label htmlFor="plant-upload" className="cursor-pointer">
+                                    <div className="relative z-0">
                                         {previewUrl ? (
-                                            <img src={previewUrl} alt="Preview" className="mx-auto h-48 object-cover rounded-md" />
+                                            <div className="relative">
+                                                <img src={previewUrl} alt="Preview" className="mx-auto h-48 w-full object-cover rounded-lg border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" />
+                                                <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                                                    <span className="text-white font-bold bg-black px-3 py-1 rounded-md">Change Photo</span>
+                                                </div>
+                                            </div>
                                         ) : (
-                                            <div className="flex flex-col items-center">
-                                                <Upload className="h-10 w-10 text-agricultural-stone-gray mb-2" />
-                                                <span className="text-sm text-agricultural-stone-gray">Click to upload photo</span>
+                                            <div className="flex flex-col items-center py-8">
+                                                <div className="w-16 h-16 rounded-full bg-green-100 border-2 border-black flex items-center justify-center mb-4">
+                                                    <Upload className="h-8 w-8 text-green-700" />
+                                                </div>
+                                                <span className="text-sm font-bold text-gray-900">Click to upload photo</span>
+                                                <span className="text-xs text-gray-500 mt-1">Supports JPG, PNG</span>
                                             </div>
                                         )}
-                                    </label>
+                                    </div>
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-agricultural-soil-brown mb-2">
+                                <label className="block text-sm font-bold text-gray-900 mb-2">
                                     2. Describe Symptoms (Optional)
                                 </label>
                                 <textarea
-                                    className="w-full border border-agricultural-stone-gray/30 rounded-md p-3 focus:ring-2 focus:ring-agricultural-forest-green focus:outline-none"
-                                    rows="4"
+                                    className="w-full border-2 border-black rounded-xl p-4 text-sm font-medium focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-[2px] transition-all focus:outline-none placeholder:text-gray-400 min-h-[120px]"
                                     placeholder="e.g., Yellowing leaves with brown spots, wilting despite watering..."
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
@@ -107,7 +117,7 @@ const PlantDisease = ({ onBack }) => {
                             <button
                                 onClick={handleAnalyze}
                                 disabled={isLoading}
-                                className="w-full bg-agricultural-forest-green hover:bg-agricultural-crop-green text-white font-semibold py-3 rounded-md transition-colors flex items-center justify-center"
+                                className="w-full bg-green-600 text-white font-black uppercase tracking-wider py-4 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center text-sm"
                             >
                                 {isLoading ? (
                                     <>
@@ -122,32 +132,32 @@ const PlantDisease = ({ onBack }) => {
                         </div>
 
                         {/* Results Section */}
-                        <div className="bg-agricultural-soft-sand rounded-lg p-6 border border-agricultural-stone-gray/10">
-                            <h3 className="text-lg font-semibold text-agricultural-soil-brown mb-4 flex items-center">
+                        <div className="bg-gray-50 rounded-2xl p-6 border-2 border-black h-full">
+                            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center border-b-2 border-black pb-2">
                                 <Info className="mr-2 h-5 w-5" /> Diagnosis Report
                             </h3>
 
                             {!analysis ? (
-                                <div className="h-full flex flex-col items-center justify-center text-agricultural-stone-gray opacity-70">
-                                    <Leaf className="h-16 w-16 mb-4 text-gray-300" />
-                                    <p>Submit details to generate report</p>
+                                <div className="h-[300px] flex flex-col items-center justify-center text-gray-400">
+                                    <Leaf className="h-20 w-20 mb-4 opacity-20" />
+                                    <p className="font-bold text-center">Submit details to<br />generate analysis report</p>
                                 </div>
                             ) : (
-                                <div className="space-y-4 animate-in fade-in duration-500">
-                                    <div className="bg-white p-4 rounded-md border-l-4 border-agricultural-drought-orange shadow-sm">
-                                        <h4 className="font-semibold text-agricultural-drought-orange flex items-center mb-2">
-                                            Analysis
+                                <div className="space-y-6 animate-in fade-in duration-500">
+                                    <div className="bg-white p-5 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(251,146,60,1)]">
+                                        <h4 className="font-bold text-orange-600 flex items-center mb-3 uppercase tracking-wider text-xs">
+                                            <AlertTriangle className="h-4 w-4 mr-2" /> Analysis
                                         </h4>
-                                        <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+                                        <p className="text-sm text-gray-900 font-medium leading-relaxed">
                                             {analysis}
                                         </p>
                                     </div>
 
-                                    <div className="bg-white p-4 rounded-md border-l-4 border-agricultural-crop-green shadow-sm">
-                                        <h4 className="font-semibold text-agricultural-crop-green flex items-center mb-2">
+                                    <div className="bg-white p-5 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(74,222,128,1)]">
+                                        <h4 className="font-bold text-green-600 flex items-center mb-3 uppercase tracking-wider text-xs">
                                             <CheckCircle className="h-4 w-4 mr-2" /> Recommendation
                                         </h4>
-                                        <p className="text-sm text-gray-700">
+                                        <p className="text-sm text-gray-900 font-medium leading-relaxed">
                                             Based on the AI diagnosis, please follow the suggested treatment plan. If symptoms persist, consult a local extension officer.
                                         </p>
                                     </div>

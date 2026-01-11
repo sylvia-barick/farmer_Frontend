@@ -211,7 +211,7 @@ const LoanApplication = ({ user, onBack }) => {
           {/* Replaces Button component */}
           <button
             onClick={onBack}
-            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 text-agricultural-soil-brown hover:bg-agricultural-stone-gray/10"
+            className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-bold border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] h-10 px-4 py-2 text-gray-900 transition-all"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
@@ -220,10 +220,10 @@ const LoanApplication = ({ user, onBack }) => {
 
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-agricultural-soil-brown mb-2">
+            <h1 className="text-4xl font-black text-gray-900 mb-2">
               Loan Application
             </h1>
-            <p className="text-agricultural-stone-gray">
+            <p className="text-gray-600 font-medium">
               Apply for an agricultural loan with data-backed predictions
             </p>
           </div>
@@ -232,85 +232,90 @@ const LoanApplication = ({ user, onBack }) => {
             {/* Loan Application Form */}
             <div className="lg:col-span-2">
               {/* Replaces Card component */}
-              <div className="rounded-lg border bg-white text-card-foreground shadow-sm warm-shadow border-agricultural-stone-gray/20">
+              <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
                 {/* Replaces CardHeader */}
-                <div className="flex flex-col space-y-1.5 p-6">
+                <div className="flex flex-col space-y-1.5 p-6 border-b-2 border-black bg-green-50 rounded-t-2xl">
                   {/* Replaces CardTitle */}
-                  <h3 className="flex items-center text-2xl font-semibold leading-none tracking-tight text-agricultural-soil-brown">
-                    <CreditCard className="h-5 w-5 mr-2" />
+                  <h3 className="flex items-center text-2xl font-bold leading-none tracking-tight text-gray-900">
+                    <CreditCard className="h-6 w-6 mr-2" />
                     Loan Details
                   </h3>
                 </div>
                 {/* Replaces CardContent */}
-                <div className="p-6 pt-0">
+                <div className="p-6">
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                       {/* Replaces Label component */}
-                      <label htmlFor="loanPurpose" className="text-agricultural-soil-brown text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block">
+                      <label htmlFor="loanPurpose" className="text-gray-900 text-sm font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
                         Loan Purpose
                       </label>
                       {/* Replaces Select, SelectTrigger, SelectValue, SelectContent, SelectItem */}
-                      <select
-                        id="loanPurpose"
-                        value={formData.loanPurpose}
-                        onChange={(e) => handleChange('loanPurpose', e.target.value)}
-                        className="flex h-10 w-full rounded-md border border-agricultural-stone-gray/30 bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-agricultural-forest-green focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-2 appearance-none pr-8 leading-tight" // Added appearance-none and pr-8 for custom arrow if desired
-                      >
-                        <option value="" disabled hidden>Select loan purpose</option>
-                        <option value="crop-cultivation">Crop Cultivation</option>
-                        <option value="equipment-purchase">Equipment Purchase</option>
-                        <option value="land-improvement">Land Improvement</option>
-                        <option value="livestock">Livestock Purchase</option>
-                        <option value="working-capital">Working Capital</option>
-                      </select>
-                      {/* Optional custom arrow for select, if appearance-none is used above */}
-                      {/* <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-agricultural-stone-gray">
-                          <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                      </div> */}
+                      <div className="relative">
+                        <select
+                          id="loanPurpose"
+                          value={formData.loanPurpose}
+                          onChange={(e) => handleChange('loanPurpose', e.target.value)}
+                          className="flex h-12 w-full rounded-xl border-2 border-black bg-white px-3 py-2 text-sm font-medium focus-visible:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-[2px] transition-all disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
+                        >
+                          <option value="" disabled hidden>Select loan purpose</option>
+                          <option value="crop-cultivation">Crop Cultivation</option>
+                          <option value="equipment-purchase">Equipment Purchase</option>
+                          <option value="land-improvement">Land Improvement</option>
+                          <option value="livestock">Livestock Purchase</option>
+                          <option value="working-capital">Working Capital</option>
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-900 font-bold">
+                          <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+                        </div>
+                      </div>
                     </div>
 
                     <div>
                       {/* Replaces Label component */}
-                      <label htmlFor="selectedCrop" className="text-agricultural-soil-brown text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block">
+                      <label htmlFor="selectedCrop" className="text-gray-900 text-sm font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
                         Select Crop (for loan assessment)
                       </label>
-                      {/* Replaces Select, SelectTrigger, SelectValue, SelectContent, SelectItem */}
-                      <select
-                        id="selectedCrop"
-                        value={formData.selectedCropId}
-                        onChange={(e) => {
-                          const cropId = e.target.value;
-                          handleChange('selectedCropId', cropId);
-                          // Update the selected crop state
-                          const selectedCropData = cropHistory.find(crop => crop._id === cropId);
-                          setSelectedCrop(selectedCropData);
-                        }}
-                        className="flex h-10 w-full rounded-md border border-agricultural-stone-gray/30 bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-agricultural-forest-green focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-2 appearance-none pr-8 leading-tight"
-                      >
-                        <option value="" disabled hidden>Select a crop from your history</option>
-                        {cropHistory.map((item) => (
-                          <option key={item._id} value={item._id}>
-                            {item.cropName.charAt(0).toUpperCase() + item.cropName.slice(1)}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="relative">
+                        <select
+                          id="selectedCrop"
+                          value={formData.selectedCropId}
+                          onChange={(e) => {
+                            const cropId = e.target.value;
+                            handleChange('selectedCropId', cropId);
+                            // Update the selected crop state
+                            const selectedCropData = cropHistory.find(crop => crop._id === cropId);
+                            setSelectedCrop(selectedCropData);
+                          }}
+                          className="flex h-12 w-full rounded-xl border-2 border-black bg-white px-3 py-2 text-sm font-medium focus-visible:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-[2px] transition-all disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
+                        >
+                          <option value="" disabled hidden>Select a crop from your history</option>
+                          {cropHistory.map((item) => (
+                            <option key={item._id} value={item._id}>
+                              {item.cropName.charAt(0).toUpperCase() + item.cropName.slice(1)}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-900 font-bold">
+                          <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+                        </div>
+                      </div>
                     </div>
 
                     {selectedCrop && (
-                      <div className="p-4 bg-agricultural-forest-green/10 rounded-md border border-agricultural-forest-green/20">
-                        <h4 className="font-medium text-agricultural-soil-brown mb-2">Selected Crop Details</h4>
-                        <div className="text-sm text-agricultural-stone-gray space-y-1">
-                          <p><span className="font-medium">Crop:</span> {selectedCrop.cropName.charAt(0).toUpperCase() + selectedCrop.cropName.slice(1)}</p>
-                          <p><span className="font-medium">Land Size:</span> {selectedCrop.acresOfLand} acres</p>
-                          <p><span className="font-medium">Predicted Yield:</span> {selectedCrop.predictedYieldKgPerAcre} kg/acre</p>
-                          <p><span className="font-medium">Climate Score:</span> {selectedCrop.climateScore}%</p>
+                      <div className="p-4 bg-green-50 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                        <h4 className="font-bold text-gray-900 mb-2 border-b-2 border-black pb-1 inline-block">Selected Crop Details</h4>
+                        <div className="text-sm text-gray-700 space-y-1 mt-2">
+                          <p><span className="font-bold">Crop:</span> {selectedCrop.cropName.charAt(0).toUpperCase() + selectedCrop.cropName.slice(1)}</p>
+                          <p><span className="font-bold">Land Size:</span> {selectedCrop.acresOfLand} acres</p>
+                          <p><span className="font-bold">Predicted Yield:</span> {selectedCrop.predictedYieldKgPerAcre} kg/acre</p>
+                          <p><span className="font-bold">Climate Score:</span> {selectedCrop.climateScore}%</p>
                         </div>
                       </div>
                     )}
 
                     <div>
                       {/* Replaces Label component */}
-                      <label htmlFor="requestedAmount" className="text-agricultural-soil-brown text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block">
+                      <label htmlFor="requestedAmount" className="text-gray-900 text-sm font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
                         Requested Amount (₹)
                       </label>
                       {/* Replaces Input component */}
@@ -320,36 +325,41 @@ const LoanApplication = ({ user, onBack }) => {
                         placeholder="Enter amount"
                         value={formData.requestedAmount}
                         onChange={(e) => handleChange('requestedAmount', e.target.value)}
-                        className="flex h-10 w-full rounded-md border border-agricultural-stone-gray/30 bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-agricultural-forest-green focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-2"
+                        className="flex h-12 w-full rounded-xl border-2 border-black bg-white px-3 py-2 text-sm font-medium focus-visible:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-[2px] transition-all disabled:cursor-not-allowed disabled:opacity-50 placeholder:text-gray-400"
                       />
                     </div>
 
                     <div>
                       {/* Replaces Label component */}
-                      <label htmlFor="loanTenure" className="text-agricultural-soil-brown text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block">
+                      <label htmlFor="loanTenure" className="text-gray-900 text-sm font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
                         Loan Tenure
                       </label>
                       {/* Replaces Select, SelectTrigger, SelectValue, SelectContent, SelectItem */}
-                      <select
-                        id="loanTenure"
-                        value={formData.loanTenure}
-                        onChange={(e) => handleChange('loanTenure', e.target.value)}
-                        className="flex h-10 w-full rounded-md border border-agricultural-stone-gray/30 bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-agricultural-forest-green focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-2 appearance-none pr-8 leading-tight" // Added appearance-none and pr-8 for custom arrow if desired
-                      >
-                        <option value="" disabled hidden>Select loan tenure</option>
-                        <option value="1-year">1 Year</option>
-                        <option value="2-years">2 Years</option>
-                        <option value="3-years">3 Years</option>
-                        <option value="5-years">5 Years</option>
-                        <option value="7-years">7 Years</option>
-                      </select>
+                      <div className="relative">
+                        <select
+                          id="loanTenure"
+                          value={formData.loanTenure}
+                          onChange={(e) => handleChange('loanTenure', e.target.value)}
+                          className="flex h-12 w-full rounded-xl border-2 border-black bg-white px-3 py-2 text-sm font-medium focus-visible:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-[2px] transition-all disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
+                        >
+                          <option value="" disabled hidden>Select loan tenure</option>
+                          <option value="1-year">1 Year</option>
+                          <option value="2-years">2 Years</option>
+                          <option value="3-years">3 Years</option>
+                          <option value="5-years">5 Years</option>
+                          <option value="7-years">7 Years</option>
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-900 font-bold">
+                          <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Replaces Button component */}
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 w-full bg-agricultural-forest-green hover:bg-agricultural-crop-green text-white h-10 px-4 py-2"
+                      className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-black uppercase tracking-wider ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 w-full bg-green-600 text-white h-12 px-4 py-2 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                     >
                       {isLoading ? (
                         <>
@@ -368,41 +378,41 @@ const LoanApplication = ({ user, onBack }) => {
             {/* How Loans Work */}
             <div className="space-y-6">
               {/* Replaces Card component */}
-              <div className="rounded-lg border bg-white text-card-foreground shadow-sm warm-shadow border-agricultural-stone-gray/20">
+              <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
                 {/* Replaces CardHeader */}
-                <div className="flex flex-col space-y-1.5 p-6">
+                <div className="flex flex-col space-y-1.5 p-6 border-b-2 border-black">
                   {/* Replaces CardTitle */}
-                  <h3 className="text-2xl font-semibold leading-none tracking-tight text-agricultural-soil-brown">How It Works</h3>
+                  <h3 className="text-xl font-bold leading-none tracking-tight text-gray-900">How It Works</h3>
                 </div>
                 {/* Replaces CardContent */}
-                <div className="p-6 pt-0 space-y-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-agricultural-forest-green/10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-agricultural-forest-green font-semibold text-sm">1</span>
+                <div className="p-6 space-y-6">
+                  <div className="flex items-start space-x-4">
+                    <div className="w-10 h-10 bg-green-100 rounded-xl border-2 border-black flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                      <span className="text-green-700 font-bold text-lg">1</span>
                     </div>
                     <div>
-                      <h4 className="font-medium text-agricultural-soil-brown">Submit Application</h4>
-                      <p className="text-sm text-agricultural-stone-gray">Fill out the loan application with your requirements</p>
+                      <h4 className="font-bold text-gray-900">Submit Application</h4>
+                      <p className="text-sm text-gray-600 mt-1">Fill out the loan application with your requirements</p>
                     </div>
                   </div>
 
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-agricultural-forest-green/10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-agricultural-forest-green font-semibold text-sm">2</span>
+                  <div className="flex items-start space-x-4">
+                    <div className="w-10 h-10 bg-green-100 rounded-xl border-2 border-black flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                      <span className="text-green-700 font-bold text-lg">2</span>
                     </div>
                     <div>
-                      <h4 className="font-medium text-agricultural-soil-brown">Data Review</h4>
-                      <p className="text-sm text-agricultural-stone-gray">Banks review your yield predictions and farm data</p>
+                      <h4 className="font-bold text-gray-900">Data Review</h4>
+                      <p className="text-sm text-gray-600 mt-1">Banks review your yield predictions and farm data</p>
                     </div>
                   </div>
 
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-agricultural-forest-green/10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-agricultural-forest-green font-semibold text-sm">3</span>
+                  <div className="flex items-start space-x-4">
+                    <div className="w-10 h-10 bg-green-100 rounded-xl border-2 border-black flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                      <span className="text-green-700 font-bold text-lg">3</span>
                     </div>
                     <div>
-                      <h4 className="font-medium text-agricultural-soil-brown">Approval</h4>
-                      <p className="text-sm text-agricultural-stone-gray">Get faster approval based on AI predictions</p>
+                      <h4 className="font-bold text-gray-900">Approval</h4>
+                      <p className="text-sm text-gray-600 mt-1">Get faster approval based on AI predictions</p>
                     </div>
                   </div>
                 </div>
@@ -410,32 +420,32 @@ const LoanApplication = ({ user, onBack }) => {
 
               {/* Benefits */}
               {/* Replaces Card component */}
-              <div className="rounded-lg border bg-white text-card-foreground shadow-sm warm-shadow border-agricultural-stone-gray/20">
+              <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
                 {/* Replaces CardHeader */}
-                <div className="flex flex-col space-y-1.5 p-6">
+                <div className="flex flex-col space-y-1.5 p-6 border-b-2 border-black bg-yellow-50 rounded-t-2xl">
                   {/* Replaces CardTitle */}
-                  <h3 className="flex items-center text-2xl font-semibold leading-none tracking-tight text-agricultural-soil-brown">
+                  <h3 className="flex items-center text-xl font-bold leading-none tracking-tight text-gray-900">
                     <TrendingUp className="h-5 w-5 mr-2" />
                     Benefits
                   </h3>
                 </div>
                 {/* Replaces CardContent */}
-                <div className="p-6 pt-0 space-y-3">
+                <div className="p-6 space-y-3">
                   <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-agricultural-crop-green" />
-                    <span className="text-sm text-agricultural-soil-brown">Lower interest rates</span>
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <span className="text-sm font-bold text-gray-700">Lower interest rates</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-agricultural-crop-green" />
-                    <span className="text-sm text-agricultural-soil-brown">Faster processing</span>
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <span className="text-sm font-bold text-gray-700">Faster processing</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-agricultural-crop-green" />
-                    <span className="text-sm text-agricultural-soil-brown">Data-backed approval</span>
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <span className="text-sm font-bold text-gray-700">Data-backed approval</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-agricultural-crop-green" />
-                    <span className="text-sm text-agricultural-soil-brown">Flexible repayment</span>
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <span className="text-sm font-bold text-gray-700">Flexible repayment</span>
                   </div>
                 </div>
               </div>
@@ -446,17 +456,17 @@ const LoanApplication = ({ user, onBack }) => {
           <div className="mt-8 grid lg:grid-cols-3 gap-8">
             {/* Left side - takes 2 columns */}
             <div className="lg:col-span-2">
-              <div className="rounded-lg border bg-white text-card-foreground shadow-sm warm-shadow border-agricultural-stone-gray/20 h-96">
-                <div className="flex flex-col space-y-1.5 p-6">
-                  <h3 className="text-2xl font-semibold leading-none tracking-tight text-agricultural-soil-brown">
+              <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] h-full">
+                <div className="flex flex-col space-y-1.5 p-6 border-b-2 border-black">
+                  <h3 className="text-xl font-bold leading-none tracking-tight text-gray-900">
                     Additional Information
                   </h3>
                 </div>
-                <div className="p-6 pt-0">
-                  <p className="text-agricultural-stone-gray">
+                <div className="p-6">
+                  <p className="text-gray-600 font-medium">
                     This section takes up the remaining screen space beside the form. You can add any content here such as:
                   </p>
-                  <ul className="mt-4 space-y-2 text-agricultural-stone-gray">
+                  <ul className="mt-4 space-y-2 text-gray-600">
                     <li>• Loan application guidelines</li>
                     <li>• Required documents</li>
                     <li>• Terms and conditions</li>
@@ -468,31 +478,31 @@ const LoanApplication = ({ user, onBack }) => {
 
             {/* Right side - takes 1 column */}
             <div className="lg:col-span-1">
-              <div className="rounded-lg border bg-white text-card-foreground shadow-sm warm-shadow border-agricultural-stone-gray/20 h-96">
-                <div className="flex flex-col space-y-1.5 p-6">
-                  <h3 className="text-2xl font-semibold leading-none tracking-tight text-agricultural-soil-brown">
+              <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] h-full">
+                <div className="flex flex-col space-y-1.5 p-6 border-b-2 border-black">
+                  <h3 className="text-xl font-bold leading-none tracking-tight text-gray-900">
                     Quick Actions
                   </h3>
                 </div>
-                <div className="p-6 pt-0">
+                <div className="p-6">
                   <div className="space-y-3">
                     <button
                       onClick={generatePDF}
-                      className="w-full text-left p-3 rounded-md border border-agricultural-stone-gray/20 hover:bg-agricultural-forest-green/5 transition-colors"
+                      className="w-full text-left p-4 rounded-xl border-2 border-black bg-white hover:bg-gray-50 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                     >
-                      <div className="font-medium text-agricultural-soil-brown">Download Application</div>
-                      <div className="text-sm text-agricultural-stone-gray">Get PDF copy</div>
+                      <div className="font-bold text-gray-900">Download Application</div>
+                      <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mt-1">Get PDF copy</div>
                     </button>
                     <button
                       onClick={() => setShowStatus(true)}
-                      className="w-full text-left p-3 rounded-md border border-agricultural-stone-gray/20 hover:bg-agricultural-forest-green/5 transition-colors"
+                      className="w-full text-left p-4 rounded-xl border-2 border-black bg-white hover:bg-gray-50 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                     >
-                      <div className="font-medium text-agricultural-soil-brown">Track Status</div>
-                      <div className="text-sm text-agricultural-stone-gray">Check application progress</div>
+                      <div className="font-bold text-gray-900">Track Status</div>
+                      <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mt-1">Check application progress</div>
                     </button>
-                    <button className="w-full text-left p-3 rounded-md border border-agricultural-stone-gray/20 hover:bg-agricultural-forest-green/5 transition-colors">
-                      <div className="font-medium text-agricultural-soil-brown">Contact Support</div>
-                      <div className="text-sm text-agricultural-stone-gray">Get help with application</div>
+                    <button className="w-full text-left p-4 rounded-xl border-2 border-black bg-white hover:bg-gray-50 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
+                      <div className="font-bold text-gray-900">Contact Support</div>
+                      <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mt-1">Get help with application</div>
                     </button>
                   </div>
                 </div>

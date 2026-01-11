@@ -245,57 +245,48 @@ const InsuranceClaim = ({ user, onBack }) => {
   };
 
   return (
-    <div className="min-h-screen bg-agricultural-soft-sand">
-      <div className="p-4 sm:p-6 lg:p-8">
-        <div className="flex items-center mb-4 sm:mb-6">
-          {/* Replaces Button component */}
-          <button
-            onClick={onBack}
-            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-3 sm:px-4 py-2 text-agricultural-soil-brown hover:bg-agricultural-stone-gray/10"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            <span className="hidden sm:inline">Back to Dashboard</span>
-            <span className="sm:hidden">Back</span>
-          </button>
+    <div className="min-h-screen bg-agricultural-soft-sand p-4 sm:p-8">
+      <div className="max-w-7xl mx-auto">
+        <button
+          onClick={onBack}
+          className="mb-6 inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-bold border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] h-10 px-4 py-2 text-gray-900 transition-all"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          <span className="hidden sm:inline">Back to Dashboard</span>
+          <span className="sm:hidden">Back</span>
+        </button>
+
+        <div className="mb-8">
+          <h1 className="text-3xl sm:text-4xl font-black text-gray-900 mb-2">
+            Insurance Claim
+          </h1>
+          <p className="text-gray-600 font-medium text-sm sm:text-base">
+            File a crop insurance claim for damages or losses
+          </p>
         </div>
 
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-agricultural-soil-brown mb-2">
-              Insurance Claim
-            </h1>
-            <p className="text-agricultural-stone-gray text-sm sm:text-base">
-              File a crop insurance claim for damages or losses
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8">
-            {/* Insurance Claim Form */}
-            <div className="xl:col-span-1 order-1 xl:order-1">
-              {/* Replaces Card component */}
-              <div className="rounded-lg border bg-white text-card-foreground shadow-sm warm-shadow border-agricultural-stone-gray/20">
-                {/* Replaces CardHeader */}
-                <div className="flex flex-col space-y-1.5 p-4 sm:p-6">
-                  {/* Replaces CardTitle */}
-                  <h3 className="flex items-center text-xl sm:text-2xl font-semibold leading-none tracking-tight text-agricultural-soil-brown">
-                    <Shield className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                    Claim Details
-                  </h3>
-                </div>
-                {/* Replaces CardContent */}
-                <div className="p-4 sm:p-6 pt-0">
-                  <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-                    <div>
-                      {/* Replaces Label component */}
-                      <label htmlFor="provider" className="text-agricultural-soil-brown text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block">
-                        Insurance Provider
-                      </label>
-                      {/* Replaces Select, SelectTrigger, SelectValue, SelectContent, SelectItem */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          {/* Insurance Claim Form */}
+          <div className="xl:col-span-1 order-1 xl:order-1">
+            <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+              <div className="flex flex-col space-y-1.5 p-6 border-b-2 border-black bg-green-50 rounded-t-2xl">
+                <h3 className="flex items-center text-xl font-black text-gray-900">
+                  <Shield className="h-6 w-6 mr-2 text-green-700" />
+                  Claim Details
+                </h3>
+              </div>
+              <div className="p-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div>
+                    <label htmlFor="provider" className="block text-sm font-bold text-gray-900 mb-2">
+                      Insurance Provider
+                    </label>
+                    <div className="relative">
                       <select
                         id="provider"
                         value={formData.provider}
                         onChange={(e) => handleChange('provider', e.target.value)}
-                        className="flex h-10 w-full rounded-md border border-agricultural-stone-gray/30 bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-agricultural-forest-green focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-2 appearance-none pr-8 leading-tight"
+                        className="flex h-12 w-full rounded-xl border-2 border-black bg-white px-3 py-2 text-sm font-medium focus-visible:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-[2px] transition-all disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
                       >
                         <option value="" disabled hidden>Select insurance provider</option>
                         <option value="aic">Agriculture Insurance Company of India (AIC)</option>
@@ -304,172 +295,160 @@ const InsuranceClaim = ({ user, onBack }) => {
                         <option value="hdfc-ergo">HDFC ERGO General Insurance</option>
                         <option value="tata-aig">Tata AIG General Insurance</option>
                       </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-900 font-bold">
+                        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="uin" className="block text-sm font-bold text-gray-900 mb-2">
+                      UIN (Unique Identification Number)
+                    </label>
+                    <input
+                      id="uin"
+                      type="text"
+                      placeholder="Enter UIN"
+                      value={formData.uin}
+                      onChange={(e) => handleChange('uin', e.target.value)}
+                      className="flex h-12 w-full rounded-xl border-2 border-black bg-white px-3 py-2 text-sm font-medium focus-visible:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-[2px] transition-all disabled:cursor-not-allowed disabled:opacity-50 placeholder:text-gray-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="policyNumber" className="block text-sm font-bold text-gray-900 mb-2">
+                      Policy Number
+                    </label>
+                    <input
+                      id="policyNumber"
+                      type="text"
+                      placeholder="Enter policy number"
+                      value={formData.policyNumber}
+                      onChange={(e) => handleChange('policyNumber', e.target.value)}
+                      className="flex h-12 w-full rounded-xl border-2 border-black bg-white px-3 py-2 text-sm font-medium focus-visible:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-[2px] transition-all disabled:cursor-not-allowed disabled:opacity-50 placeholder:text-gray-400"
+                    />
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-bold text-gray-900 border-b-2 border-black pb-2">Required Documents</h3>
+
+                    <div>
+                      <label htmlFor="policyDocument" className="block text-sm font-bold text-gray-900 mb-2">
+                        Policy Document (Text file for AI analysis)
+                      </label>
+                      <div className="border-2 border-dashed border-black rounded-xl p-4 hover:bg-gray-50 transition-colors bg-white relative group">
+                        <input
+                          id="policyDocument"
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png,.txt"
+                          onChange={(e) => handleFileChange('policyDocument', e.target.files?.[0] || null)}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="flex items-center justify-center space-x-3 text-gray-600">
+                          <div className="w-10 h-10 rounded-full bg-blue-100 border-2 border-black flex items-center justify-center flex-shrink-0">
+                            <FileText className="h-5 w-5 text-blue-700" />
+                          </div>
+                          <span className="text-xs sm:text-sm font-bold">{formData.policyDocument ? formData.policyDocument.name : 'Upload Policy Document'}</span>
+                        </div>
+                      </div>
                     </div>
 
                     <div>
-                      {/* Replaces Label component */}
-                      <label htmlFor="uin" className="text-agricultural-soil-brown text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block">
-                        UIN (Unique Identification Number)
+                      <label htmlFor="damageImage" className="block text-sm font-bold text-gray-900 mb-2">
+                        Damage Image
                       </label>
-                      {/* Replaces Input component */}
-                      <input
-                        id="uin"
-                        type="text"
-                        placeholder="Enter UIN"
-                        value={formData.uin}
-                        onChange={(e) => handleChange('uin', e.target.value)}
-                        className="flex h-10 w-full rounded-md border border-agricultural-stone-gray/30 bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-agricultural-forest-green focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-2"
-                      />
+                      <div className="border-2 border-dashed border-black rounded-xl p-4 hover:bg-gray-50 transition-colors bg-white relative group">
+                        <input
+                          id="damageImage"
+                          type="file"
+                          accept=".jpg,.jpeg,.png"
+                          onChange={(e) => handleFileChange('damageImage', e.target.files?.[0] || null)}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="flex items-center justify-center space-x-3 text-gray-600">
+                          <div className="w-10 h-10 rounded-full bg-red-100 border-2 border-black flex items-center justify-center flex-shrink-0">
+                            <Camera className="h-5 w-5 text-red-700" />
+                          </div>
+                          <span className="text-xs sm:text-sm font-bold">{formData.damageImage ? formData.damageImage.name : 'Upload Damage Image'}</span>
+                        </div>
+                      </div>
                     </div>
 
                     <div>
-                      {/* Replaces Label component */}
-                      <label htmlFor="policyNumber" className="text-agricultural-soil-brown text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block">
-                        Policy Number
+                      <label htmlFor="fieldImage" className="block text-sm font-bold text-gray-900 mb-2">
+                        Field Image
                       </label>
-                      {/* Replaces Input component */}
-                      <input
-                        id="policyNumber"
-                        type="text"
-                        placeholder="Enter policy number"
-                        value={formData.policyNumber}
-                        onChange={(e) => handleChange('policyNumber', e.target.value)}
-                        className="flex h-10 w-full rounded-md border border-agricultural-stone-gray/30 bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-agricultural-forest-green focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-2"
-                      />
-                    </div>
-
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-medium text-agricultural-soil-brown">Required Documents</h3>
-
-                      <div>
-                        {/* Replaces Label component */}
-                        <label htmlFor="policyDocument" className="text-agricultural-soil-brown text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block">
-                          Policy Document (Text file for AI analysis)
-                        </label>
-                        <div className="mt-2 border-2 border-dashed border-agricultural-stone-gray/30 rounded-lg p-3 sm:p-4">
-                          <input
-                            id="policyDocument"
-                            type="file"
-                            accept=".pdf,.jpg,.jpeg,.png,.txt"
-                            onChange={(e) => handleFileChange('policyDocument', e.target.files?.[0] || null)}
-                            className="hidden" // Hides the default file input
-                          />
-                          {/* Custom styled label to act as the file input button */}
-                          <label htmlFor="policyDocument" className="cursor-pointer flex items-center justify-center space-x-2 text-agricultural-stone-gray hover:text-agricultural-soil-brown text-center">
-                            <FileText className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
-                            <span className="text-xs sm:text-sm">{formData.policyDocument ? formData.policyDocument.name : 'Upload Policy Document (.txt for AI analysis)'}</span>
-                          </label>
-                        </div>
-                      </div>
-
-                      <div>
-                        {/* Replaces Label component */}
-                        <label htmlFor="damageImage" className="text-agricultural-soil-brown text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block">
-                          Damage Image
-                        </label>
-                        <div className="mt-2 border-2 border-dashed border-agricultural-stone-gray/30 rounded-lg p-3 sm:p-4">
-                          <input
-                            id="damageImage"
-                            type="file"
-                            accept=".jpg,.jpeg,.png"
-                            onChange={(e) => handleFileChange('damageImage', e.target.files?.[0] || null)}
-                            className="hidden" // Hides the default file input
-                          />
-                          {/* Custom styled label to act as the file input button */}
-                          <label htmlFor="damageImage" className="cursor-pointer flex items-center justify-center space-x-2 text-agricultural-stone-gray hover:text-agricultural-soil-brown text-center">
-                            <Camera className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
-                            <span className="text-xs sm:text-sm">{formData.damageImage ? formData.damageImage.name : 'Upload Damage Image'}</span>
-                          </label>
-                        </div>
-                      </div>
-
-                      {/* Field Image Upload */}
-                      <div>
-                        {/* Replaces Label component */}
-                        <label htmlFor="fieldImage" className="text-agricultural-soil-brown text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block">
-                          Field Image
-                        </label>
-                        <div className="mt-2 border-2 border-dashed border-agricultural-stone-gray/30 rounded-lg p-3 sm:p-4">
-                          <input
-                            id="fieldImage"
-                            type="file"
-                            accept=".jpg,.jpeg,.png"
-                            onChange={(e) => handleFileChange('fieldImage', e.target.files?.[0] || null)}
-                            className="hidden"
-                          />
-                          <label htmlFor="fieldImage" className="cursor-pointer flex items-center justify-center space-x-2 text-agricultural-stone-gray hover:text-agricultural-soil-brown text-center">
-                            <Upload className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
-                            <span className="text-xs sm:text-sm">{formData.fieldImage ? formData.fieldImage.name : 'Upload Field Image'}</span>
-                          </label>
+                      <div className="border-2 border-dashed border-black rounded-xl p-4 hover:bg-gray-50 transition-colors bg-white relative group">
+                        <input
+                          id="fieldImage"
+                          type="file"
+                          accept=".jpg,.jpeg,.png"
+                          onChange={(e) => handleFileChange('fieldImage', e.target.files?.[0] || null)}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="flex items-center justify-center space-x-3 text-gray-600">
+                          <div className="w-10 h-10 rounded-full bg-green-100 border-2 border-black flex items-center justify-center flex-shrink-0">
+                            <Upload className="h-5 w-5 text-green-700" />
+                          </div>
+                          <span className="text-xs sm:text-sm font-bold">{formData.fieldImage ? formData.fieldImage.name : 'Upload Field Image'}</span>
                         </div>
                       </div>
                     </div>
+                  </div>
 
-                    {/* Replaces Button component */}
-                    <div className='flex flex-col sm:flex-row justify-center gap-3 sm:gap-4'>
-                      <button
-                        type="submit"
-                        className="inline-flex items-center justify-center whitespace-nowrap 
-                      rounded-md text-sm font-medium ring-offset-background transition-colors 
-                      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring 
-                      focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 
-                      w-full bg-agricultural-forest-green hover:bg-agricultural-crop-green text-white 
-                      h-10 px-4 py-2"
-                        disabled={isSubmitting}
-                      >
-                        {isSubmitting && (
-                          <svg className="animate-spin mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                          </svg>
-                        )}
-                        Submit Insurance Claim
-                      </button>
+                  <div className='flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 pt-4'>
+                    <button
+                      type="submit"
+                      className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-black uppercase tracking-wider transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 w-full bg-green-600 text-white h-12 px-4 py-2 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting && (
+                        <svg className="animate-spin mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                        </svg>
+                      )}
+                      Submit Insurance Claim
+                    </button>
 
-                      <button
-                        type="button"
-                        onClick={handleAiPrediction}
-                        disabled={isLoadingAi}
-                        className="inline-flex items-center justify-center whitespace-nowrap 
-                      rounded-md text-sm font-medium ring-offset-background transition-colors 
-                      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring 
-                      focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 
-                      w-full bg-agricultural-wheat-brown border border-bg-amber-800
-                      text-white hover:bg-amber-600 
-                      h-10 px-4 py-2"
-                      >
-                        {isLoadingAi ? 'Analyzing Policy...' : 'Analyze Policy with AI'}
-                      </button>
-                    </div>
-                  </form>
-                </div>
+                    <button
+                      type="button"
+                      onClick={handleAiPrediction}
+                      disabled={isLoadingAi}
+                      className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-black uppercase tracking-wider transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 w-full bg-yellow-500 text-black border-2 border-black h-12 px-4 py-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                    >
+                      {isLoadingAi ? 'Analyzing Policy...' : 'Analyze Policy with AI'}
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
-            <div className='xl:col-span-1 order-2 xl:order-2'>
-              {/* Gemini response div */}
-              <div className='rounded-lg border bg-white text-card-foreground shadow-sm warm-shadow 
-              border-agricultural-stone-gray/20 h-fit max-h-full min-h-[300px] sm:min-h-[400px] overflow-y-auto'>
-                <div className='flex flex-col h-full justify-center space-y-1.5 p-4 sm:p-6'>
-                  <h3 className='text-xl sm:text-2xl font-semibold leading-none tracking-tight mb-4 sm:mb-6
-                  text-agricultural-soil-brown'>
-                    Know your policy
-                  </h3>
+          </div>
+          <div className='xl:col-span-1 order-2 xl:order-2'>
+            {/* Gemini response div */}
+            <div className='rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] h-fit max-h-full min-h-[300px] sm:min-h-[400px] overflow-hidden flex flex-col'>
+              <div className="flex flex-col space-y-1.5 p-6 border-b-2 border-black bg-yellow-50 rounded-t-2xl">
+                <h3 className='text-xl sm:text-2xl font-black leading-none tracking-tight text-gray-900'>
+                  Know your policy
+                </h3>
+              </div>
 
-                  {geminiResponse !== '' ? (
-                    <div className='flex p-3 sm:p-4 bg-agricultural-soft-sand rounded-lg'>
-                      <div className="text-agricultural-soil-brown text-xs sm:text-sm leading-relaxed whitespace-pre-wrap">
-                        <ReactMarkdown>{geminiResponse}</ReactMarkdown>
-                      </div>
-                    </div>)
-                    : (
-                      <div className="flex items-center justify-center h-[200px] sm:h-[250px]">
-                        <h1 className="text-gray-300 text-sm sm:text-lg text-center px-4">
-                          Upload a text file and click "Analyze Policy with AI" to get a summary
-                        </h1>
-                      </div>
-                    )
-                  }
-                </div>
+              <div className='flex flex-col h-full p-6 overflow-y-auto'>
+                {geminiResponse !== '' ? (
+                  <div className='p-4 bg-gray-50 border-2 border-black rounded-xl'>
+                    <div className="text-gray-900 text-xs sm:text-sm leading-relaxed whitespace-pre-wrap font-medium">
+                      <ReactMarkdown>{geminiResponse}</ReactMarkdown>
+                    </div>
+                  </div>)
+                  : (
+                    <div className="flex flex-col items-center justify-center h-full text-gray-400 py-12">
+                      <FileText className="h-16 w-16 mb-4 opacity-20" />
+                      <h1 className="text-gray-500 text-sm sm:text-base font-bold text-center px-4 max-w-xs">
+                        Upload a text file and click "Analyze Policy with AI" to get a summary
+                      </h1>
+                    </div>
+                  )
+                }
               </div>
             </div>
           </div>

@@ -94,87 +94,93 @@ const PastReports = ({ user, onBack }) => {
   };
 
   return (
+
     <div className="min-h-screen bg-agricultural-soft-sand p-4 sm:p-8">
       {/* Header */}
-      <div className="mb-6 sm:mb-8">
+      <div className="mb-8">
         <button
           onClick={onBack}
-          className="mb-4 text-agricultural-soil-brown hover:bg-agricultural-stone-gray/10 px-3 py-2 rounded-md inline-flex items-center text-sm font-medium transition-colors"
+          className="mb-6 inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-bold border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] h-10 px-4 py-2 text-gray-900 transition-all"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Dashboard
         </button>
 
         <div className="flex items-center space-x-3 mb-2">
-          <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-agricultural-forest-green" />
-          <h1 className="text-2xl sm:text-3xl font-bold text-agricultural-soil-brown">Past Reports</h1>
+          <FileText className="h-8 w-8 sm:h-10 sm:w-10 text-gray-900" />
+          <h1 className="text-3xl sm:text-4xl font-black text-gray-900">Past Reports</h1>
         </div>
-        <p className="text-sm sm:text-base text-agricultural-stone-gray">
+        <p className="text-sm sm:text-base text-gray-600 font-medium max-w-2xl">
           View and manage your complete history of insurance claims and yield predictions.
         </p>
       </div>
 
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-agricultural-forest-green"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-black border-t-transparent"></div>
         </div>
       ) : (
         /* Two Column Layout */
-        <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
+        <div className="grid lg:grid-cols-2 gap-8">
 
           {/* Insurance Claim History */}
           <div>
-            <div className="bg-white rounded-lg shadow-md border border-agricultural-stone-gray/20 p-4 sm:p-6 warm-shadow h-full">
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg sm:text-xl font-semibold text-agricultural-soil-brown flex items-center">
-                  <Shield className="h-5 w-5 mr-2 text-agricultural-forest-green" />
-                  Insurance Claim History
-                </h2>
-                <span className="text-xs font-medium bg-agricultural-soft-sand px-2 py-1 rounded-full text-agricultural-stone-gray">
-                  {insuranceHistory.length} Records
-                </span>
+            <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] h-full overflow-hidden flex flex-col">
+              <div className="flex flex-col space-y-1.5 p-6 border-b-2 border-black bg-green-50">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-black text-gray-900 flex items-center">
+                    <Shield className="h-6 w-6 mr-2 text-green-700" />
+                    Insurance Claim History
+                  </h2>
+                  <span className="text-xs font-bold bg-white border-2 border-black px-3 py-1 rounded-full text-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                    {insuranceHistory.length} Records
+                  </span>
+                </div>
               </div>
 
-              <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+              <div className="p-6 space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar flex-1">
                 {insuranceHistory.length > 0 ? (
                   insuranceHistory.map((claim) => (
                     <div
                       key={claim._id}
-                      className="bg-gray-50 rounded-lg p-4 border border-agricultural-stone-gray/10 hover:shadow-md transition-all group relative"
+                      className="bg-white rounded-xl p-5 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all group relative"
                     >
                       <button
                         onClick={() => handleDeleteInsurance(claim._id)}
-                        className="absolute top-3 right-3 p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-3 right-3 p-1.5 text-black hover:text-red-600 hover:bg-red-50 rounded-md border-2 border-transparent hover:border-black transition-all opacity-0 group-hover:opacity-100"
                         title="Delete Record"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
 
-                      <div className="flex justify-between items-start mb-3 pr-8">
+                      <div className="flex justify-between items-start mb-4 pr-8">
                         <div>
-                          <h3 className="font-semibold text-agricultural-soil-brown text-base">{claim.provider}</h3>
-                          <p className="text-xs text-agricultural-stone-gray font-mono mt-0.5">Policy: {claim.policyNumber || 'N/A'}</p>
+                          <h3 className="font-bold text-gray-900 text-lg">{claim.provider}</h3>
+                          <p className="text-xs text-gray-600 font-bold font-mono mt-1">Policy: {claim.policyNumber || 'N/A'}</p>
                         </div>
-                        <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border ${getStatusColor(claim.status)}`}>
+                        <span className={`inline-flex items-center gap-1.5 text-xs font-black px-3 py-1 rounded-lg border-2 border-black ${claim.status?.toLowerCase() === 'approved' || claim.status?.toLowerCase() === 'success' ? 'bg-green-100' :
+                          claim.status?.toLowerCase() === 'rejected' || claim.status?.toLowerCase() === 'failed' ? 'bg-red-100' :
+                            'bg-yellow-100'
+                          }`}>
                           {getStatusIcon(claim.status)}
                           {claim.status}
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-sm mt-3 pt-3 border-t border-gray-200">
+                      <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm mt-3 pt-3 border-t-2 border-black/10">
                         <div>
-                          <span className="text-xs text-agricultural-stone-gray block">Damage Confidence</span>
-                          <span className="font-medium text-agricultural-soil-brown">{claim.damageConfidence ? `${claim.damageConfidence}%` : 'N/A'}</span>
+                          <span className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Damage Confidence</span>
+                          <span className="font-black text-gray-900">{claim.damageConfidence ? `${claim.damageConfidence}%` : 'N/A'}</span>
                         </div>
                         <div>
-                          <span className="text-xs text-agricultural-stone-gray block">Authenticity Score</span>
-                          <span className="font-medium text-agricultural-soil-brown">{claim.authenticityScore ? `${claim.authenticityScore}%` : 'N/A'}</span>
+                          <span className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Authenticity Score</span>
+                          <span className="font-black text-gray-900">{claim.authenticityScore ? `${claim.authenticityScore}%` : 'N/A'}</span>
                         </div>
                         <div className="col-span-2">
-                          <span className="text-xs text-agricultural-stone-gray block">Submission Date</span>
-                          <div className="flex items-center mt-0.5">
-                            <Calendar className="h-3 w-3 mr-1.5 text-agricultural-stone-gray" />
-                            <span className="font-medium text-agricultural-soil-brown">
+                          <span className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Submission Date</span>
+                          <div className="flex items-center">
+                            <Calendar className="h-3 w-3 mr-1.5 text-gray-700" />
+                            <span className="font-bold text-gray-900">
                               {new Date(claim.submissionDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                             </span>
                           </div>
@@ -182,10 +188,10 @@ const PastReports = ({ user, onBack }) => {
                       </div>
                     </div>
                   ))) : (
-                  <div className="text-center py-12 text-agricultural-stone-gray bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                    <CreditCard className="h-10 w-10 mx-auto mb-3 text-agricultural-stone-gray/40" />
-                    <p className="font-medium">No insurance claims found</p>
-                    <p className="text-xs mt-1">Your submitted claims will appear here</p>
+                  <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-black">
+                    <CreditCard className="h-12 w-12 mx-auto mb-3 text-gray-400" />
+                    <p className="font-bold text-gray-900">No insurance claims found</p>
+                    <p className="text-xs font-medium text-gray-500 mt-1">Your submitted claims will appear here</p>
                   </div>
                 )}
               </div>
@@ -194,80 +200,82 @@ const PastReports = ({ user, onBack }) => {
 
           {/* Yield Prediction History */}
           <div>
-            <div className="bg-white rounded-lg shadow-md border border-agricultural-stone-gray/20 p-4 sm:p-6 warm-shadow h-full">
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg sm:text-xl font-semibold text-agricultural-soil-brown flex items-center">
-                  <TrendingUp className="h-5 w-5 mr-2 text-agricultural-forest-green" />
-                  Yield Prediction History
-                </h2>
-                <span className="text-xs font-medium bg-agricultural-soft-sand px-2 py-1 rounded-full text-agricultural-stone-gray">
-                  {yieldClaimHistory.length} Records
-                </span>
+            <div className="rounded-2xl border-2 border-black bg-white text-card-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] h-full overflow-hidden flex flex-col">
+              <div className="flex flex-col space-y-1.5 p-6 border-b-2 border-black bg-yellow-50">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-black text-gray-900 flex items-center">
+                    <TrendingUp className="h-6 w-6 mr-2 text-yellow-700" />
+                    Yield Prediction History
+                  </h2>
+                  <span className="text-xs font-bold bg-white border-2 border-black px-3 py-1 rounded-full text-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                    {yieldClaimHistory.length} Records
+                  </span>
+                </div>
               </div>
 
-              <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+              <div className="p-6 space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar flex-1">
                 {yieldClaimHistory.length > 0 ? (
                   yieldClaimHistory.map((prediction) => (
                     <div
                       key={prediction._id}
-                      className="bg-gray-50 rounded-lg p-4 border border-agricultural-stone-gray/10 hover:shadow-md transition-all group relative"
+                      className="bg-white rounded-xl p-5 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all group relative"
                     >
                       <button
                         onClick={() => handleDeleteYield(prediction._id)}
-                        className="absolute top-3 right-3 p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-3 right-3 p-1.5 text-black hover:text-red-600 hover:bg-red-50 rounded-md border-2 border-transparent hover:border-black transition-all opacity-0 group-hover:opacity-100"
                         title="Delete Record"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
 
-                      <div className="flex justify-between items-start mb-3 pr-8">
+                      <div className="flex justify-between items-start mb-4 pr-8">
                         <div>
-                          <h3 className="font-semibold text-agricultural-soil-brown text-lg capitalize">{prediction.cropName || 'Unknown Crop'}</h3>
-                          <p className="text-xs text-agricultural-stone-gray font-mono mt-0.5">ID: {prediction._id.slice(-6).toUpperCase()}</p>
+                          <h3 className="font-black text-gray-900 text-xl capitalize">{prediction.cropName || 'Unknown Crop'}</h3>
+                          <p className="text-xs text-gray-600 font-bold font-mono mt-1">ID: {prediction._id.slice(-6).toUpperCase()}</p>
                         </div>
-                        <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border ${getStatusColor(prediction.status || 'Predicted')}`}>
+                        <span className="inline-flex items-center gap-1.5 text-xs font-black px-3 py-1 rounded-lg border-2 border-black bg-yellow-100">
                           {getStatusIcon(prediction.status || 'Predicted')}
                           {prediction.status || 'Predicted'}
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-sm bg-white p-3 rounded-md border border-gray-100">
+                      <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-sm bg-gray-50 p-3 rounded-lg border-2 border-black/10">
                         <div className="flex justify-between items-center">
-                          <span className="text-agricultural-stone-gray text-xs">Land Size</span>
-                          <span className="font-medium text-agricultural-soil-brown">{prediction.acresOfLand || 0} acres</span>
+                          <span className="text-gray-600 font-bold text-xs">Land Size</span>
+                          <span className="font-black text-gray-900">{prediction.acresOfLand || 0} acres</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-agricultural-stone-gray text-xs">Predicted Yield</span>
-                          <span className="font-medium text-agricultural-soil-brown">{prediction.predictedYieldKgPerAcre ? prediction.predictedYieldKgPerAcre.toFixed(1) : 0} kg/acre</span>
+                          <span className="text-gray-600 font-bold text-xs">Predicted Yield</span>
+                          <span className="font-black text-gray-900">{prediction.predictedYieldKgPerAcre ? prediction.predictedYieldKgPerAcre.toFixed(1) : 0} kg/acre</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-agricultural-stone-gray text-xs">Yield Category</span>
-                          <span className="font-medium text-agricultural-soil-brown">{prediction.yieldCategory}</span>
+                          <span className="text-gray-600 font-bold text-xs">Yield Category</span>
+                          <span className="font-black text-gray-900">{prediction.yieldCategory}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-agricultural-stone-gray text-xs">Climate Score</span>
-                          <span className={`font-medium ${prediction.climateScore > 75 ? 'text-green-600' : 'text-amber-600'}`}>
+                          <span className="text-gray-600 font-bold text-xs">Climate Score</span>
+                          <span className={`font-black ${prediction.climateScore > 75 ? 'text-green-700' : 'text-amber-700'}`}>
                             {prediction.climateScore || '-'}%
                           </span>
                         </div>
                       </div>
 
-                      <div className="mt-3 pt-2 border-t border-agricultural-stone-gray/10 flex items-center justify-between text-xs text-agricultural-stone-gray">
+                      <div className="mt-3 pt-2 border-t-2 border-black/10 flex items-center justify-between text-xs text-gray-600 font-medium">
                         <div className="flex items-center">
                           <Calendar className="h-3 w-3 mr-1.5" />
                           {new Date(prediction.createdAt || prediction.predictionDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                         </div>
                         <div className='flex items-center gap-2'>
-                          <span>Soil: {prediction.soilType || 'N/A'}</span>
+                          <span className="bg-gray-200 px-2 py-0.5 rounded border border-gray-400 text-[10px] uppercase font-bold text-gray-800">Soil: {prediction.soilType || 'N/A'}</span>
                         </div>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-12 text-agricultural-stone-gray bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                    <TrendingUp className="h-10 w-10 mx-auto mb-3 text-agricultural-stone-gray/40" />
-                    <p className="font-medium">No yield predictions found</p>
-                    <p className="text-xs mt-1">Make a prediction to see it here</p>
+                  <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-black">
+                    <TrendingUp className="h-12 w-12 mx-auto mb-3 text-gray-400" />
+                    <p className="font-bold text-gray-900">No yield predictions found</p>
+                    <p className="text-xs font-medium text-gray-500 mt-1">Make a prediction to see it here</p>
                   </div>
                 )}
               </div>
