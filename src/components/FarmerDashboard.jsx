@@ -25,15 +25,17 @@ import YieldResults from "./YieldResult";
 import LoanApplication from "./loanApplication";
 import InsuranceClaim from "./insuranceClaim";
 import PlantDisease from "./PlantDisease";
+import LoanStatus from "./LoanStatus";
+import InsuranceStatus from "./InsuranceStatus";
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth, db } from '../utils/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import PastReports from "./pastRecords";
 import KisaanSaathi from "./kisaanSaathi";
-import { Menu } from 'lucide-react';
+import { Menu, ClipboardList } from 'lucide-react';
 import axios from 'axios';
-import { getWeather, getFarmSummary, getAgriculturalNews } from '../services/backendApi'; // Import new services
+import { getWeather, getFarmSummary, getAgriculturalNews } from '../services/backendApi';
 import FarmMap from './FarmMap';
 
 const FarmerDashboard = ({ user, onLogout }) => {
@@ -441,7 +443,9 @@ const FarmerDashboard = ({ user, onLogout }) => {
                 { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
                 { id: 'prediction', label: 'New Prediction', icon: TrendingUp },
                 { id: 'loan-application', label: 'Loan Application', icon: CreditCard },
+                { id: 'my-loans', label: 'My Loans', icon: ClipboardList },
                 { id: 'insurance-claim', label: 'Insurance Claim', icon: Shield },
+                { id: 'my-insurance', label: 'My Insurance', icon: ClipboardList },
                 { id: 'past-reports', label: 'Past Reports', icon: FileText },
                 { id: 'plant-disease', label: 'Plant Doctor', icon: Leaf },
 
@@ -662,6 +666,24 @@ const FarmerDashboard = ({ user, onLogout }) => {
           {
             activeSection === 'insurance-claim' && (
               <InsuranceClaim
+                user={displayData?.user || {}}
+                onBack={() => setActiveSection('dashboard')}
+              />
+            )
+          }
+
+          {
+            activeSection === 'my-loans' && (
+              <LoanStatus
+                user={displayData?.user || {}}
+                onBack={() => setActiveSection('dashboard')}
+              />
+            )
+          }
+
+          {
+            activeSection === 'my-insurance' && (
+              <InsuranceStatus
                 user={displayData?.user || {}}
                 onBack={() => setActiveSection('dashboard')}
               />

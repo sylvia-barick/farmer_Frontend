@@ -82,6 +82,11 @@ const KisaanSaathi = ({ user }) => {
 
       if (flowState !== 'IDLE') {
         const result = await handleFlowInput(currentInput, currentFile);
+        // If result is null, a topic switch occurred (startFlow was called)
+        if (result === null) {
+          setIsLoading(false);
+          return;
+        }
         responseData.analysis = result;
       } else {
         const intent = detectIntent(currentInput);
@@ -149,6 +154,17 @@ const KisaanSaathi = ({ user }) => {
       setFlowData({});
       setStep(0);
       return "❌ Process cancelled. How else can I help you?";
+    }
+
+    // 🔄 TOPIC SWITCH DETECTION: Check if user wants to switch to a different topic mid-flow
+    const newIntent = detectIntent(input);
+    if (newIntent && newIntent !== flowState) {
+      // User is asking about a different topic - switch immediately
+      setFlowState('IDLE');
+      setFlowData({});
+      setStep(0);
+      startFlow(newIntent);
+      return null; // startFlow will add the message
     }
 
     // LOAN FLOW
@@ -405,8 +421,8 @@ const KisaanSaathi = ({ user }) => {
             {chats.map((chat, index) => (
               <div key={index} className={`flex flex-col ${chat.type === 'query' ? 'items-end' : 'items-start'}`}>
                 <div className={`max-w-[85%] p-3 font-semibold text-sm border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] rounded-lg ${chat.type === 'query'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-white text-black'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-white text-black'
                   }`}>
                   <p className="whitespace-pre-wrap">{chat.query}</p>
                   {chat.attachment && (
